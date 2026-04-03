@@ -7,6 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/momo-s15/aeroform/actions/workflows/ci.yml"><img src="https://github.com/momo-s15/aeroform/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/momo-s15/aeroform/actions/workflows/security.yml"><img src="https://github.com/momo-s15/aeroform/actions/workflows/security.yml/badge.svg" alt="Security"></a>
   <a href="https://github.com/momo-s15/aeroform/releases/latest"><img src="https://img.shields.io/github/v/release/momo-s15/aeroform?include_prereleases&sort=semver" alt="Release"></a>
   <a href="https://pkg.go.dev/github.com/momo-s15/aeroform"><img src="https://pkg.go.dev/badge/github.com/momo-s15/aeroform.svg" alt="Go Reference"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
@@ -74,6 +75,8 @@ aeroform generate "kubernetes cluster with database"
 </table>
 
 **Prerequisites:** [Go 1.26.1+](https://go.dev/dl/) | [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
+
+**Pin a release (example):** `go install github.com/momo-s15/aeroform@v1.0.2` — or use `@latest`. Binaries are on [Releases](https://github.com/momo-s15/aeroform/releases).
 
 ---
 
@@ -244,12 +247,27 @@ aeroform/
 
 | Page | Description |
 |------|-------------|
+| [Documentation home](docs/index.md) | Overview, requirements, CI/contributing links |
 | [Getting Started — Simple](docs/getting-started-simple.md) | Install to deployed website in 5 minutes |
 | [Getting Started — Pro](docs/getting-started-pro.md) | Config to EKS cluster with security gating |
 | [Template Reference](docs/template-reference.md) | All 32 templates with resources and costs |
 | [LLM Backends](docs/llm-backends.md) | Ollama, OpenAI, Bedrock setup |
 | [Security Model](docs/security-model.md) | Scanning, policies, auto-correction |
 | [Architecture Decisions](docs/architecture-decisions.md) | Design rationale and trade-offs |
+
+---
+
+## Development
+
+From a clone of the repo:
+
+```bash
+go test ./...                 # unit tests
+golangci-lint run ./...       # lint (config: .golangci.yml, golangci-lint v2)
+make integration              # Docker + LocalStack + integration tests
+```
+
+CI runs **lint**, **unit**, and **integration** (LocalStack service container) on every push/PR; **govulncheck** runs under **Security**. **E2E** (real AWS) runs on `v*` tags when repository/environment secrets are configured; otherwise it skips. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

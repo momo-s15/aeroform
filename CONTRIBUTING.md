@@ -2,50 +2,74 @@
 
 Thanks for contributing to Aeroform.
 
-The project is built in phases. Contributions are easiest to review when they are small, tested, and aligned with the active phase tracked in AEROFORM_PLAN.md.
+Keep pull requests **focused** (one feature or fix), **tested**, and consistent with existing style. For historical implementation context, see `AEROFORM_PLAN.md` and `aeroform_blueprint.md`.
 
-## Development Workflow
+## What you need
 
-1. Open an issue or pick an existing one.
-2. Keep each pull request focused on one feature or fix.
-3. Add or update tests for behavior changes.
-4. Run `go test ./...` before opening a pull request.
+- **Go 1.26.1+** (match `go.mod` / `toolchain`; CI uses `go-version-file: go.mod`)
+- **Terraform** on `PATH` for integration-style checks locally
+- **Docker** (optional) for `make integration` with LocalStack
+- **golangci-lint v2** for `make lint` — [install](https://golangci-lint.run/welcome/install/) or rely on CI
 
-## What To Work On
+## Local checks
 
-Good first contributions:
+```bash
+go test ./...                    # unit tests (default; no integration/e2e tags)
+golangci-lint run ./...          # same linters as CI (.golangci.yml v2)
+make integration                 # LocalStack + integration tests (needs Docker)
+```
 
-- Expand provider template mappings in `internal/providers/`
-- Improve command UX wording in `cmd/`
-- Improve security summary formatting in `internal/security/`
-- Improve docs and examples in `README.md` and this file
+Integration tests only:
 
-Higher-scope contributions:
+```bash
+go test -tags integration -timeout 300s ./test/integration/...
+```
 
-- Add deeper Terraform execution wiring in Pro Mode
-- Add richer drift detection and live-state reconciliation
-- Add docs and release workflow polish for launch readiness
+E2E tests (real AWS; **charges possible**):
 
-## Coding Expectations
+```bash
+export AWS_REGION=us-east-1
+# ... credentials or instance profile ...
+go test -tags e2e -timeout 900s ./test/e2e/...
+```
 
-- Preserve existing project structure and naming patterns.
-- Avoid unrelated refactors in feature PRs.
-- Prefer explicit, readable logic over clever shortcuts.
-- Keep user-facing output clear and actionable.
+## CI (GitHub Actions)
+
+| Workflow | When | What |
+|----------|------|------|
+| `ci.yml` | push / PR | lint (golangci-lint v2.9), unit tests, LocalStack integration |
+| `security.yml` | push / PR | `govulncheck`, dependency review (PRs) |
+| `e2e.yml` | tags `v*` | E2E if `AWS_E2E_ROLE_ARN` + `AWS_ACCOUNT_ID` set for `e2e` env; else skip |
+| `release.yml` | tags `v*.*.*` | tests + build release assets |
+
+## Good first contributions
+
+- Template or provider tweaks in `internal/providers/` and `templates/`
+- Command help text and UX in `cmd/`
+- Security scan summaries in `internal/security/`
+- Docs in `README.md`, `docs/`, and this file
+
+## Coding expectations
+
+- Match surrounding naming, structure, and import style.
+- No unrelated refactors in feature PRs.
+- Prefer clear, explicit logic over clever shortcuts.
+- User-facing errors and logs should be actionable.
 - Add tests for new package-level behavior.
 
-## Pull Request Checklist
+## Pull request checklist
 
-- [ ] Feature or fix is scoped and described clearly
-- [ ] Tests added or updated
-- [ ] `go test ./...` passes locally
-- [ ] Docs updated when behavior changes
+- [ ] Scope and intent are clear in the description
+- [ ] Tests added or updated where behavior changed
+- [ ] `go test ./...` passes
+- [ ] `golangci-lint run ./...` passes (or CI green)
+- [ ] User-facing docs updated if commands or flags changed
 
-## Reporting Problems
+## Reporting problems
 
-If you find unexpected behavior, open an issue with:
+Open an issue with:
 
-- The command you ran
-- Relevant input (prompt/config)
+- The exact command you ran
+- Relevant prompt, `config.yaml`, or flags
 - Expected vs actual behavior
-- Logs or terminal output snippets
+- Logs or terminal snippets (redact secrets)

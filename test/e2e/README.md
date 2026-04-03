@@ -1,39 +1,49 @@
 # End-to-End Tests
 
-E2E tests deploy real infrastructure to a cloud account, verify it works, then
-destroy everything. They are guarded by `//go:build e2e` and never run in
-normal CI.
+E2E tests deploy real infrastructure in **AWS**, verify behavior, then destroy resources. They are guarded by `//go:build e2e` and are **not** part of `go test ./...`.
 
 ## Prerequisites
 
-- Real AWS credentials (via env vars, profile, or OIDC role)
-- Terraform CLI
-- Go 1.26.1+
+- **AWS** credentials (environment variables, shared config, or instance role)
+- **Terraform** on `PATH`
+- **Go 1.26.1+**
 
 ## Running locally
 
 ```bash
-# Requires real AWS credentials in your environment
 export AWS_REGION=us-east-1
+# Ensure AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (or equivalent) are set
 make e2e
 ```
 
-## What's tested
+Or:
 
-- **Simple Mode static-site**: full deploy → verify outputs → destroy
-- **Simple Mode lambda-api**: full deploy → verify outputs → destroy
-- **Pro Mode VPC**: full deploy → verify outputs → destroy
+```bash
+go test -tags e2e -timeout 900s -v ./test/e2e/...
+```
 
-Every test uses `defer terraform.Destroy(workDir, true)` to ensure cleanup
-even on failure.
+**Warning:** E2E tests create billable resources. Use a dedicated sandbox account when possible.
 
-## CI
+## What is tested
 
-The `.github/workflows/e2e.yml` workflow runs E2E tests only on version tag
-pushes (`v*`). It uses OIDC to assume an IAM role from the `e2e` GitHub
-environment, which should be configured with:
+| Test | Area |
+|------|------|
+| `TestSimpleModeDeployStaticSite` | Simple Mode static-site on AWS |
+| `TestSimpleModeDeployLambdaAPI` | Simple Mode `lambda-api` on AWS |
+| `TestProModeDeployVPC` | Pro Mode VPC module composition on AWS |
 
-- `AWS_E2E_ROLE_ARN` — IAM role ARN with deploy permissions
-- `AWS_ACCOUNT_ID` — AWS account ID for template variables
+Tests use `defer` cleanup so `terraform destroy` still runs after failures.
 
-This ensures real cloud tests run before release artifacts are published.
+## CI (GitHub Actions)
+
+Workflow: `.github/workflows/e2e.yml` — triggers on **tags** matching `v*` (e.g. `v1.0.2`).
+
+1. **Detect E2E configuration** — If `AWS_E2E_ROLE_ARN` and `AWS_ACCOUNT_ID` are **empty** (repository or `e2e` environment secrets), subsequent steps are **skipped** and the workflow **succeeds** with a notice. This is intentional for forks and repos that have not wired OIDC yet.
+2. When both secrets are set, the job uses **OIDC** (`aws-actions/configure-aws-credentials`) to assume the role and runs `go test -tags e2e ./test/e2e/...`.
+
+Configure the **`e2e`** GitHub Environment (or repository secrets) with:
+
+- `AWS_E2E_ROLE_ARN` — IAM role ARN trusted for GitHub OIDC
+- `AWS_ACCOUNT_ID` — used where tests need an account id variable
+
+See also [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full CI matrix.

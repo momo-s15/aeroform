@@ -4,6 +4,8 @@ Aeroform uses an LLM to understand your infrastructure prompt and select the bes
 
 Three backends are supported. Ollama is the default and recommended for most users.
 
+**Toolchain:** Build Aeroform with **Go 1.26.1+** (see repository `go.mod`). LLM configuration lives under `llm:` in `config.yaml` (Pro) or defaults for Simple Mode.
+
 ---
 
 ## Ollama (Default)

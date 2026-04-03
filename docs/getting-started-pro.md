@@ -6,7 +6,7 @@ Pro Mode is for teams and professionals who need explicit control over infrastru
 
 | Tool | Why | Install |
 |------|-----|---------|
-| **Go 1.21+** | Build and run Aeroform | [go.dev/dl](https://go.dev/dl/) |
+| **Go 1.26.1+** | Build and run Aeroform (see `go.mod` / toolchain) | [go.dev/dl](https://go.dev/dl/) |
 | **Terraform** | Provisions cloud resources | [developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install) |
 | **Ollama** | Local LLM for template selection | [ollama.com/download](https://ollama.com/download) |
 | **Checkov** | Security scanning (required for Pro Mode gate) | `pip install checkov` |

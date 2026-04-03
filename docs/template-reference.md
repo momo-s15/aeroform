@@ -16,6 +16,8 @@ Every template follows these principles:
 
 Simple Mode templates are single, self-contained Terraform configurations designed for one-command deployment. Each template deploys a complete, working project.
 
+**Counts:** 14 Simple templates in total — **10** on AWS, **2** on Azure, **2** on GCP.
+
 ### AWS — Simple Mode (10 templates)
 
 | Template | Description | Resources | Est. Cost |
@@ -50,6 +52,8 @@ Simple Mode templates are single, self-contained Terraform configurations design
 ## Pro Mode Templates
 
 Pro Mode templates are designed to be composed together. The LLM selects a set of templates based on your prompt, and Aeroform renders each as a Terraform module with a root `main.tf` that wires them together.
+
+**Counts:** 18 Pro templates in total — **8** AWS, **6** Azure, **4** GCP.
 
 ### AWS — Pro Mode (8 templates)
 

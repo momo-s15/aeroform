@@ -30,5 +30,6 @@ docker compose down
 
 ## CI
 
-The `integration` job in `.github/workflows/ci.yml` runs these tests automatically
-using GitHub Actions service containers (LocalStack).
+The `integration` job in `.github/workflows/ci.yml` runs these tests on every push and pull request using a **LocalStack** service container (pinned image), **Terraform** setup, and `go test -tags integration ./test/integration/...`.
+
+For contributor commands and lint/test expectations, see [CONTRIBUTING.md](../../CONTRIBUTING.md).

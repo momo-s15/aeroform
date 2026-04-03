@@ -1,5 +1,8 @@
-# Azure Bootstrap Checklist
+# Azure bootstrap checklist
 
-- Validate federated identity setup
-- Validate storage account for Terraform state
-- Validate subscription and resource group access
+After running `aeroform bootstrap --repo owner/repo` and applying the steps:
+
+- [ ] Federated credential / app registration allows your GitHub repo subject
+- [ ] Storage account and container for Terraform state exist
+- [ ] Backend `azurerm` configuration matches resource group, account, and container
+- [ ] Pipeline identity can read/write state and deploy resources

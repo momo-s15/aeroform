@@ -29,6 +29,10 @@ Relevant areas include:
 - Security scan gating behavior in `internal/security/`
 - Local state handling in `.aeroform/`
 
+## Automated checks
+
+The default branch runs **`govulncheck`** and **`golangci-lint`** in GitHub Actions. Dependency changes on pull requests are reviewed by the **dependency-review** workflow. These do not replace responsible disclosure for undisclosed vulnerabilities.
+
 ## Disclosure Expectations
 
 - Do not publish exploit details before a fix is available.

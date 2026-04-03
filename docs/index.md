@@ -2,6 +2,8 @@
 
 Aeroform is an open-source CLI tool that deploys cloud infrastructure using natural language. It supports AWS, Azure, and GCP through pre-validated, security-hardened Terraform templates.
 
+**Requirements:** [Go 1.26.1+](https://go.dev/dl/) (matches `go.mod` and CI), [Terraform](https://developer.hashicorp.com/terraform/install), and a supported LLM backend ([Ollama](https://ollama.com/download) by default). Pro Mode security gating expects [Checkov](https://www.checkov.io/) (and optionally [tfsec](https://github.com/aquasecurity/tfsec)) on your `PATH` when you run scans locally.
+
 **Two modes, one tool:**
 
 - **Simple Mode** — Describe what you want, get it deployed. Guided prompts, cost estimates, auto-security. Perfect for students and solo developers.
@@ -39,6 +41,10 @@ aeroform generate "kubernetes cluster with database"
 | [Security Model](security-model.md) | Scanning, auto-correction, custom policies, drift detection |
 | [Architecture Decisions](architecture-decisions.md) | Why two modes, constrained generation, Go, Terraform, Checkov |
 
+## Contributing & CI
+
+Contributors should follow [CONTRIBUTING.md](../CONTRIBUTING.md). The repository runs **lint** (golangci-lint v2), **unit tests**, **integration tests** (LocalStack in GitHub Actions), and **govulncheck** on pushes and pull requests. **E2E tests** (real AWS) run on version tags when `AWS_E2E_ROLE_ARN` and `AWS_ACCOUNT_ID` are configured for the `e2e` environment; otherwise that job skips cleanly.
+
 ## Key Commands
 
 | Command | Mode | Description |
@@ -60,3 +66,13 @@ aeroform generate "kubernetes cluster with database"
 ## License
 
 Apache 2.0 — see [LICENSE](../LICENSE) in the repository root.
+
+## Releases
+
+Install a specific version with:
+
+```bash
+go install github.com/momo-s15/aeroform@v1.0.2
+```
+
+Prebuilt binaries are attached to [GitHub Releases](https://github.com/momo-s15/aeroform/releases) when the release workflow succeeds.

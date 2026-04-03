@@ -1,9 +1,21 @@
-# Azure Bootstrap
+# Azure bootstrap (library)
 
-Placeholder bootstrap workflow for Azure federated identity and state setup.
+This package implements **Azure-specific** bootstrap steps: federated identity (GitHub Actions OIDC / workload identity) and **Blob storage** backend snippets for Terraform state.
 
-Planned steps:
+Use from the CLI with Pro Mode config:
 
-- Validate workload identity configuration
-- Provision storage for Terraform state
-- Confirm resource group and subscription access
+```bash
+aeroform bootstrap --repo your-org/your-repo
+```
+
+Output is rendered by `bootstrap/bootstrap.go` using sections from `bootstrap/azure/bootstrap.go`.
+
+## What you get
+
+Typical sections include:
+
+- App registration / federated credential hints for GitHub
+- Storage account + container recommendations for remote state
+- Backend `azurerm` HCL fragments suitable to paste into your root module
+
+Run generated commands in `az` with an account that can create those resources. See [checklist.md](checklist.md).

@@ -192,3 +192,15 @@ The trade-off is that estimates may drift from actual pricing over time. This is
 - The estimates serve as a ballpark guide, not a billing commitment
 
 All cost arithmetic uses `shopspring/decimal` to avoid floating-point rounding errors.
+
+---
+
+## CI, linting, and supply chain
+
+- **Go toolchain** is pinned via `go.mod` / `toolchain` so GitHub Actions, `govulncheck`, and contributors use a consistent compiler (currently Go 1.26.1+).
+- **Lint** uses **golangci-lint v2** (`.golangci.yml` `version: "2"`) so linters stay compatible with the supported Go release.
+- **Integration tests** exercise **Terraform plan** against **LocalStack** in CI (pinned image) so AWS-shaped templates are validated without a live account.
+- **E2E tests** are optional at release time: they run on `v*` tag pushes when AWS OIDC secrets are configured; otherwise the workflow skips after detecting missing configuration.
+- **Release builds** are produced by the tag-triggered workflow (multi-platform binaries uploaded to GitHub Releases).
+
+This keeps fast feedback on every PR while still allowing opt-in real-cloud validation for maintainers who wire AWS credentials.
