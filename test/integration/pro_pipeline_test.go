@@ -27,6 +27,10 @@ func TestProVPCTemplatePlan(t *testing.T) {
 	if err := terraform.RenderTemplate(templateDir, tfVars, workDir); err != nil {
 		t.Fatalf("RenderTemplate: %v", err)
 	}
+	// variables.tf still declares required inputs; tfvars satisfies Terraform even when vars are inlined in .tf.
+	if err := terraform.GenerateTfvars(tfVars, workDir); err != nil {
+		t.Fatalf("GenerateTfvars: %v", err)
+	}
 	writeLocalStackAWSProviderOverride(t, workDir)
 
 	if err := terraform.EnsureBinary(); err != nil {
