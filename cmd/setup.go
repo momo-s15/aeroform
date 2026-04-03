@@ -17,9 +17,8 @@ var setupCmd = &cobra.Command{
 	Short: "Install and verify the local AI backend, then pull the default model",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		out := cmd.OutOrStdout()
+		printBanner(out)
 		platform := setup.DetectPlatform()
-
-		fmt.Fprintln(out, "Aeroform setup")
 
 		if setup.OllamaAvailable() {
 			fmt.Fprintln(out, "  Ollama found in PATH")

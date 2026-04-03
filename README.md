@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="docs/assets/logo.png" width="140" height="140" alt="Aeroform logo: cyan cloud with a white terminal prompt (&gt;_)">
+  <a href="https://github.com/momo-s15/aeroform">
+    <img src="https://img.shields.io/badge/Aeroform-cloud%20infrastructure%20CLI-0891b2?style=flat" alt="Aeroform — cloud infrastructure CLI">
+  </a>
 </p>
 
 <p align="center">
@@ -291,7 +293,7 @@ CI runs **lint**, **unit**, and **integration** (LocalStack service container) o
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow, expectations, and good first issues.
 
-## Security
+## Reporting vulnerabilities
 
 For vulnerability reports, see [SECURITY.md](SECURITY.md).
 

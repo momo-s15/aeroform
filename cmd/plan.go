@@ -17,6 +17,9 @@ var planCmd = &cobra.Command{
 	Short: "Pro Mode dry-run: select templates, scan, and show terraform plan without applying",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		out := cmd.OutOrStdout()
+		printBanner(out)
+
 		cfg, err := config.LoadFromFile("config.yaml")
 		if err != nil {
 			return fmt.Errorf("pro mode requires config.yaml: %w", err)
@@ -27,7 +30,6 @@ var planCmd = &cobra.Command{
 			return err
 		}
 
-		out := cmd.OutOrStdout()
 		fmt.Fprintln(out, "Aeroform Pro Mode plan (dry-run)")
 		for _, line := range plan.Summary {
 			fmt.Fprintln(out, "  "+line)

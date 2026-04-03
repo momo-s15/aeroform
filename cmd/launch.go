@@ -29,6 +29,7 @@ var launchCmd = &cobra.Command{
 		}
 
 		out := cmd.OutOrStdout()
+		printBanner(out)
 
 		plan, err := gatherSimpleLaunchPlan()
 		if err != nil {

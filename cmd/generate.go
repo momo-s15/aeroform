@@ -20,6 +20,7 @@ var generateCmd = &cobra.Command{
 	Short: "Pro Mode pipeline: select templates, scan, plan, and deploy",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		printBanner(cmd.OutOrStdout())
 		log := logger.L()
 		log.Debugw("loading config", "path", "config.yaml")
 		cfg, err := config.LoadFromFile("config.yaml")
