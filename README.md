@@ -1,14 +1,7 @@
 <p align="center">
   <a href="https://github.com/momo-s15/aeroform">
-    <img src="https://img.shields.io/badge/Aeroform-cloud%20infrastructure%20CLI-0891b2?style=flat" alt="Aeroform — cloud infrastructure CLI">
+    <img src="docs/assets/readme-banner.png" alt="Aeroform — cloud infrastructure from plain English. AWS, Azure, GCP, free AI. Open source, Apache 2.0." width="720" style="max-width: 100%; height: auto;">
   </a>
-</p>
-
-<p align="center">
-  <h1 align="center">Aeroform</h1>
-  <p align="center">
-    From a student's first website to a company's production cluster — in one command.
-  </p>
 </p>
 
 <p align="center">
@@ -38,10 +31,6 @@ Aeroform is an open-source CLI that turns plain English into cloud infrastructur
 
 ## Quick Start
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ### Simple Mode
 
 ```bash
@@ -56,9 +45,6 @@ aeroform launch
 ```
 
 Aeroform asks what you want to build, picks a template, shows costs, and deploys.
-
-</td>
-<td width="50%" valign="top">
 
 ### Pro Mode
 
@@ -75,10 +61,6 @@ aeroform plan "kubernetes cluster with database"
 # 4. Deploy
 aeroform generate "kubernetes cluster with database"
 ```
-
-</td>
-</tr>
-</table>
 
 **Runtime prerequisites (after install):** [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
 
