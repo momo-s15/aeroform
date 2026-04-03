@@ -1,0 +1,4 @@
+name: rds-private
+mode: pro
+description: "Private RDS database"
+audience: enterprise

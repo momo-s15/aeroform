@@ -1,0 +1,4 @@
+name: storage
+mode: pro
+description: "Storage account and blob containers"
+audience: enterprise

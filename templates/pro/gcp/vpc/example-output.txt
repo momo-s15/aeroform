@@ -1,0 +1,4 @@
+cloud: gcp
+template: vpc
+outputs:
+- network_name

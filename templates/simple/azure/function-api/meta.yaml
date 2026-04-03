@@ -1,0 +1,10 @@
+name: function-api
+mode: simple
+description: "Azure Functions API starter"
+cost_estimate: "$0/month"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: true
+audience: student

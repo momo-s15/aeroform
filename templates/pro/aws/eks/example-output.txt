@@ -1,0 +1,4 @@
+cloud: aws
+template: eks
+outputs:
+- cluster_name

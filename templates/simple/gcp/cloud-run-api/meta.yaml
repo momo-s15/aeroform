@@ -1,0 +1,10 @@
+name: cloud-run-api
+mode: simple
+description: "Cloud Run API starter"
+cost_estimate: "$0/month"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: true
+audience: student

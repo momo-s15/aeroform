@@ -1,0 +1,34 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Build artifacts
+bin/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# Terraform and local runtime state
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+
+# Local environment/config secrets
+.env
+.env.*
+config.yaml
+
+# Personal planning/blueprint markdown files
+AEROFORM_PLAN.md
+aeroform_blueprint.md
+*_PLAN.md
+*_blueprint.md

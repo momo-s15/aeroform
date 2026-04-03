@@ -1,0 +1,4 @@
+name: vpc
+mode: pro
+description: "VPC with public and private subnets"
+audience: enterprise

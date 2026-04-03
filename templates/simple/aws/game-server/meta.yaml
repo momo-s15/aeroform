@@ -1,0 +1,10 @@
+name: game-server
+mode: simple
+description: "EC2 game server with EBS and restricted game port"
+cost_estimate: "$30/month"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: false
+audience: student

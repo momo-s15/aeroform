@@ -1,0 +1,10 @@
+name: contact-form
+mode: simple
+description: "S3 site with Lambda/API Gateway contact form backend"
+cost_estimate: "$0/month on AWS free tier"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: true
+audience: student

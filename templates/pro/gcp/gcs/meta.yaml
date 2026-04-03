@@ -1,0 +1,4 @@
+name: gcs
+mode: pro
+description: "GCS bucket with versioning and CMEK"
+audience: enterprise

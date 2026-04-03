@@ -1,0 +1,4 @@
+name: eks
+mode: pro
+description: "EKS cluster with managed node groups"
+audience: enterprise

@@ -1,0 +1,10 @@
+site_name: Aeroform
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Simple: getting-started-simple.md
+      - Pro: getting-started-pro.md
+  - Template Reference: template-reference.md
+  - LLM Backends: llm-backends.md
+  - Security Model: security-model.md
+  - Architecture Decisions: architecture-decisions.md

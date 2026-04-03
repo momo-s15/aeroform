@@ -1,0 +1,4 @@
+name: ecs-fargate
+mode: pro
+description: "ECS Fargate service with ALB"
+audience: enterprise

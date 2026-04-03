@@ -1,0 +1,10 @@
+name: discord-bot
+mode: simple
+description: "EC2 t3.micro bot host with systemd autostart"
+cost_estimate: "$8/month"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: false
+audience: student

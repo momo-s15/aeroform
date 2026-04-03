@@ -1,0 +1,10 @@
+name: fullstack-app
+mode: simple
+description: "App Runner service with private database and S3 storage"
+cost_estimate: "$15/month"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: false
+audience: student

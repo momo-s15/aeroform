@@ -1,0 +1,4 @@
+name: cloudsql
+mode: pro
+description: "Private Cloud SQL database"
+audience: enterprise

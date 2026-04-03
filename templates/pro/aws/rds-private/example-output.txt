@@ -1,0 +1,4 @@
+cloud: aws
+template: rds-private
+outputs:
+- db_instance_identifier

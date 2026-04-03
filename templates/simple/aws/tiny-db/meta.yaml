@@ -1,0 +1,10 @@
+name: tiny-db
+mode: simple
+description: "Private starter database or DynamoDB-backed app"
+cost_estimate: "$0-15/month depending on backend"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: false
+audience: student

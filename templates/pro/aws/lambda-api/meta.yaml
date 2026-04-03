@@ -1,0 +1,4 @@
+name: lambda-api
+mode: pro
+description: "Lambda API with X-Ray and CloudWatch"
+audience: enterprise

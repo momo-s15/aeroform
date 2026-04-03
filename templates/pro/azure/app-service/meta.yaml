@@ -1,0 +1,4 @@
+name: app-service
+mode: pro
+description: "App Service with managed identity"
+audience: enterprise

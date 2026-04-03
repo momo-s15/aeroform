@@ -1,0 +1,4 @@
+cloud: azure
+template: vnet
+outputs:
+- vnet_name

@@ -1,0 +1,4 @@
+name: gke
+mode: pro
+description: "GKE cluster with Workload Identity"
+audience: enterprise

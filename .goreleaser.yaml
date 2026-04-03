@@ -1,0 +1,13 @@
+version: 2
+
+builds:
+  - id: aeroform
+    main: ./cmd/aeroform
+    binary: aeroform
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64

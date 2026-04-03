@@ -1,0 +1,4 @@
+name: cloudfront-api
+mode: pro
+description: "CloudFront distribution with WAF"
+audience: enterprise

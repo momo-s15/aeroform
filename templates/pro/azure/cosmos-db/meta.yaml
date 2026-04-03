@@ -1,0 +1,4 @@
+name: cosmos-db
+mode: pro
+description: "Cosmos DB private endpoint"
+audience: enterprise

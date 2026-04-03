@@ -1,0 +1,4 @@
+name: aks
+mode: pro
+description: "AKS cluster with managed identity"
+audience: enterprise

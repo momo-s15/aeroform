@@ -1,0 +1,4 @@
+name: key-vault
+mode: pro
+description: "Key Vault with purge protection"
+audience: enterprise
