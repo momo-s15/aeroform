@@ -15,25 +15,41 @@ jobs:
     environment: e2e
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Detect E2E configuration
+        id: detect
+        env:
+          AWS_E2E_ROLE_ARN: ${{ secrets.AWS_E2E_ROLE_ARN }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        run: |
+          if [ -n "$AWS_E2E_ROLE_ARN" ] && [ -n "$AWS_ACCOUNT_ID" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::E2E skipped: set AWS_E2E_ROLE_ARN and AWS_ACCOUNT_ID (repository or e2e environment secrets) and configure OIDC trust for GitHub Actions."
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        if: steps.detect.outputs.run == 'true'
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version-file: go.mod
 
       - name: Install Terraform
+        if: steps.detect.outputs.run == 'true'
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
       - name: Configure AWS credentials
+        if: steps.detect.outputs.run == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_E2E_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Run E2E tests
+        if: steps.detect.outputs.run == 'true'
         env:
           AWS_REGION: us-east-1
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
