@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/assets/logo.png" width="140" height="140" alt="Aeroform logo: cyan cloud with a white terminal prompt (&gt;_)">
+</p>
+
+<p align="center">
   <h1 align="center">Aeroform</h1>
   <p align="center">
     From a student's first website to a company's production cluster — in one command.
