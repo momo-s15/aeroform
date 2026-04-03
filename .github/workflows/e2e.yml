@@ -28,6 +28,7 @@ jobs:
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "::notice::E2E skipped: set AWS_E2E_ROLE_ARN and AWS_ACCOUNT_ID (repository or e2e environment secrets) and configure OIDC trust for GitHub Actions."
+          fi
 
       - name: Set up Go
         if: steps.detect.outputs.run == 'true'
