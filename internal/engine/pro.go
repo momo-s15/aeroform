@@ -7,7 +7,6 @@ import (
 	"github.com/momo-s15/aeroform/internal/config"
 	"github.com/momo-s15/aeroform/internal/llm"
 	"github.com/momo-s15/aeroform/internal/prompt"
-	"github.com/momo-s15/aeroform/internal/providers"
 )
 
 type ProPlan struct {
@@ -26,10 +25,9 @@ func BuildProPlanWithClient(cfg config.Config, promptText string, client llm.Cli
 		return ProPlan{}, fmt.Errorf("prompt is required")
 	}
 
-	provider := providers.ForCloud(cfg.Cloud)
-	templates := provider.SelectProTemplates(promptText)
+	templates := selectProTemplates(cfg.Cloud, promptText)
 	if client != nil {
-		allowed := provider.SupportedProTemplates()
+		allowed := supportedProTemplates(cfg.Cloud)
 		promptBody := prompt.BuildProPrompt(promptText, cfg.Cloud, regionForCloud(cfg), "production", allowed)
 		selection, err := llm.GenerateTemplateSelection(client, promptBody, allowed)
 		if err == nil && len(selection.Templates) > 0 {
@@ -37,7 +35,7 @@ func BuildProPlanWithClient(cfg config.Config, promptText string, client llm.Cli
 		}
 	}
 
-	region := provider.Region(cfg)
+	region := regionForCloud(cfg)
 
 	return ProPlan{
 		Prompt:    promptText,
@@ -71,5 +69,83 @@ func ProLLMClientFromConfig(cfg config.Config) llm.Client {
 }
 
 func regionForCloud(cfg config.Config) string {
-	return providers.ForCloud(cfg.Cloud).Region(cfg)
+	switch strings.ToLower(strings.TrimSpace(cfg.Cloud)) {
+	case "azure":
+		return cfg.Azure.Location
+	case "gcp":
+		return cfg.GCP.Region
+	default:
+		return cfg.AWS.Region
+	}
+}
+
+func supportedProTemplates(cloud string) []string {
+	switch strings.ToLower(strings.TrimSpace(cloud)) {
+	case "azure":
+		return []string{"vnet", "aks", "cosmos-db", "app-service", "storage", "key-vault"}
+	case "gcp":
+		return []string{"vpc", "gke", "cloudsql", "gcs", "cloud-run"}
+	default:
+		return []string{"vpc", "eks", "rds-private", "s3-private", "alb", "lambda-api", "ecs-fargate", "cloudfront-api"}
+	}
+}
+
+func selectProTemplates(cloud, prompt string) []string {
+	value := strings.ToLower(prompt)
+	switch strings.ToLower(strings.TrimSpace(cloud)) {
+	case "azure":
+		templates := []string{"vnet"}
+		if strings.Contains(value, "aks") || strings.Contains(value, "kubernetes") {
+			templates = append(templates, "aks")
+		}
+		if strings.Contains(value, "database") || strings.Contains(value, "cosmos") {
+			templates = append(templates, "cosmos-db")
+		}
+		if strings.Contains(value, "web") || strings.Contains(value, "app") {
+			templates = append(templates, "app-service")
+		}
+		if len(templates) == 1 {
+			templates = append(templates, "storage")
+		}
+		return templates
+	case "gcp":
+		templates := []string{"vpc"}
+		if strings.Contains(value, "gke") || strings.Contains(value, "kubernetes") {
+			templates = append(templates, "gke")
+		}
+		if strings.Contains(value, "database") || strings.Contains(value, "sql") {
+			templates = append(templates, "cloudsql")
+		}
+		if strings.Contains(value, "bucket") || strings.Contains(value, "storage") {
+			templates = append(templates, "gcs")
+		}
+		if len(templates) == 1 {
+			templates = append(templates, "cloud-run")
+		}
+		return templates
+	default:
+		templates := []string{"vpc"}
+		if strings.Contains(value, "eks") || strings.Contains(value, "kubernetes") {
+			templates = append(templates, "eks")
+		}
+		if strings.Contains(value, "rds") || strings.Contains(value, "database") {
+			templates = append(templates, "rds-private")
+		}
+		if strings.Contains(value, "s3") || strings.Contains(value, "bucket") || strings.Contains(value, "storage") {
+			templates = append(templates, "s3-private")
+		}
+		if strings.Contains(value, "alb") || strings.Contains(value, "load balancer") {
+			templates = append(templates, "alb")
+		}
+		if strings.Contains(value, "ecs") || strings.Contains(value, "fargate") || strings.Contains(value, "container") {
+			templates = append(templates, "ecs-fargate")
+		}
+		if strings.Contains(value, "cdn") || strings.Contains(value, "cloudfront") {
+			templates = append(templates, "cloudfront-api")
+		}
+		if len(templates) == 1 {
+			templates = append(templates, "lambda-api")
+		}
+		return templates
+	}
 }

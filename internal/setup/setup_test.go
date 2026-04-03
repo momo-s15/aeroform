@@ -34,6 +34,29 @@ func TestInstallInstructions(t *testing.T) {
 	}
 }
 
+func TestDefaultModelConstant(t *testing.T) {
+	if DefaultModel == "" {
+		t.Fatal("DefaultModel should not be empty")
+	}
+	if DefaultModel != "llama3.2" {
+		t.Fatalf("DefaultModel = %q, want %q", DefaultModel, "llama3.2")
+	}
+}
+
+func TestPullModelReturnsErrorWhenOllamaMissing(t *testing.T) {
+	originalPath := os.Getenv("PATH")
+	t.Setenv("PATH", t.TempDir())
+	t.Cleanup(func() {
+		_ = os.Setenv("PATH", originalPath)
+	})
+
+	var buf strings.Builder
+	err := PullModel("testmodel", &buf)
+	if err == nil {
+		t.Fatal("expected error when ollama is not in PATH")
+	}
+}
+
 func TestOllamaAvailableWithFakeBinary(t *testing.T) {
 	tempDir := t.TempDir()
 	binaryName := "ollama"

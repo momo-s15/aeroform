@@ -1,0 +1,10 @@
+name: file-upload
+mode: simple
+description: "S3 file upload service with presigned URLs via Lambda"
+cost_estimate: "$0/month on AWS free tier"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: true
+audience: student

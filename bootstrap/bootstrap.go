@@ -9,30 +9,42 @@ import (
 )
 
 type Report struct {
-	Cloud string
-	Steps []string
+	Cloud    string
+	Repo     string
+	Sections []providers.BootstrapSection
 }
 
-func Run(cfg config.Config) Report {
+type Params struct {
+	Repo string
+}
+
+func Run(cfg config.Config, params Params) Report {
 	provider := providers.ForCloud(cfg.Cloud)
-	steps := provider.BootstrapSteps(cfg)
-	if len(steps) == 0 {
-		steps = []string{"No bootstrap steps defined yet"}
-	}
+	sections := provider.BootstrapSections(cfg, params.Repo)
 
 	return Report{
-		Cloud: provider.Name(),
-		Steps: steps,
+		Cloud:    provider.Name(),
+		Repo:     params.Repo,
+		Sections: sections,
 	}
 }
 
 func Render(report Report) string {
-	var builder strings.Builder
-	builder.WriteString("Aeroform bootstrap\n")
-	builder.WriteString(fmt.Sprintf("cloud: %s\n", report.Cloud))
-	builder.WriteString("steps:\n")
-	for _, step := range report.Steps {
-		builder.WriteString(fmt.Sprintf("- %s\n", step))
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("Aeroform bootstrap — %s\n", report.Cloud))
+	if report.Repo != "" {
+		b.WriteString(fmt.Sprintf("GitHub repo: %s\n", report.Repo))
 	}
-	return builder.String()
+	b.WriteString("\n")
+
+	for i, section := range report.Sections {
+		b.WriteString(fmt.Sprintf("=== %d. %s ===\n\n", i+1, section.Title))
+		for _, cmd := range section.Commands {
+			b.WriteString(cmd)
+			b.WriteString("\n")
+		}
+		b.WriteString("\n")
+	}
+
+	return b.String()
 }

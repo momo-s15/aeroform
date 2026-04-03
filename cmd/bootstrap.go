@@ -8,9 +8,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var bootstrapRepo string
+
 var bootstrapCmd = &cobra.Command{
 	Use:   "bootstrap",
-	Short: "Prepare Pro Mode cloud trust and state prerequisites",
+	Short: "Generate OIDC trust + remote state setup commands for your cloud",
+	Long: `Bootstrap generates the CLI commands needed to set up:
+  - OIDC trust between GitHub Actions and your cloud provider
+  - A remote state backend (S3/Azure Blob/GCS) for Terraform
+
+Review the output and run the commands in your terminal.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := config.LoadFromFile("config.yaml")
 		if err != nil {
@@ -18,9 +25,12 @@ var bootstrapCmd = &cobra.Command{
 		}
 
 		out := cmd.OutOrStdout()
-		report := bootstrap.Run(cfg)
+		report := bootstrap.Run(cfg, bootstrap.Params{Repo: bootstrapRepo})
 		fmt.Fprint(out, bootstrap.Render(report))
-		fmt.Fprintf(out, "state backend: %s\n", cfg.State.Backend)
 		return nil
 	},
+}
+
+func init() {
+	bootstrapCmd.Flags().StringVar(&bootstrapRepo, "repo", "", "GitHub repository (owner/repo) for OIDC trust policy")
 }

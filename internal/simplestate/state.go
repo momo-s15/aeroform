@@ -17,6 +17,7 @@ type Project struct {
 	Prompt          string    `json:"prompt"`
 	CustomDomain    string    `json:"custom_domain,omitempty"`
 	MonthlyEstimate float64   `json:"monthly_estimate"`
+	WorkDir         string    `json:"work_dir,omitempty"`
 	CreatedAt       time.Time `json:"created_at"`
 }
 

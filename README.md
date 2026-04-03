@@ -1,126 +1,266 @@
-# Aeroform
+<p align="center">
+  <h1 align="center">Aeroform</h1>
+  <p align="center">
+    From a student's first website to a company's production cluster — in one command.
+  </p>
+</p>
 
-From a student's first cloud project to a team's production infrastructure.
+<p align="center">
+  <a href="https://github.com/momo-s15/aeroform/actions/workflows/ci.yml"><img src="https://github.com/momo-s15/aeroform/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/momo-s15/aeroform/releases/latest"><img src="https://img.shields.io/github/v/release/momo-s15/aeroform?include_prereleases&sort=semver" alt="Release"></a>
+  <a href="https://pkg.go.dev/github.com/momo-s15/aeroform"><img src="https://pkg.go.dev/badge/github.com/momo-s15/aeroform.svg" alt="Go Reference"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+  <img src="https://img.shields.io/badge/go-%3E%3D1.21-00ADD8" alt="Go Version">
+</p>
 
-Aeroform is an open-source CLI that turns plain English into infrastructure workflows.
+---
 
-Repository: https://github.com/momo-s15/aeroform
+Aeroform is an open-source CLI that turns plain English into cloud infrastructure. Describe what you want, and Aeroform picks the right Terraform templates, estimates costs, runs security checks, and deploys — across AWS, Azure, and GCP.
 
-- Simple Mode is a guided, beginner-first path that favors safe defaults and cost awareness.
-- Pro Mode is a config-driven workflow for platform and DevOps teams.
+**Two modes, one tool:**
 
-## Current Status
+- **Simple Mode** — guided prompts, cost estimates in dollars, auto-security. Built for students and solo developers.
+- **Pro Mode** — `config.yaml`-driven, multi-template composition, Checkov/tfsec gating, workspace environments. Built for teams.
 
-The project is in active build mode and ships in phases.
+<!-- TODO: Replace with actual terminal recording -->
+<!-- <p align="center">
+  <img src="docs/assets/demo-simple.gif" alt="Simple Mode demo" width="600">
+</p> -->
 
-- Simple Mode launch and guardrails are implemented.
-- Pro Mode command foundation and multi-cloud planning are implemented.
-- Security scan and drift command scaffolds are implemented.
+---
 
-## Why Aeroform
+## Quick Start
 
-- Plain-English workflows instead of hand-authoring every initial Terraform file.
-- Mode-aware UX so beginner and professional users can share one tool.
-- Local AI support through Ollama with fallback behavior when local AI is unavailable.
-- Security gate integration for both Simple and Pro paths.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-## Quick Start (Simple Mode)
-
-Prerequisites:
-
-- Go 1.24+
-- Optional: Ollama for AI-backed template selection
-
-Build and run:
-
-```bash
-go test ./...
-go run . setup
-go run . launch
-```
-
-Common Simple Mode commands:
-
-- `aeroform launch`
-- `aeroform status`
-- `aeroform cost`
-- `aeroform domain add mysite.com`
-- `aeroform logs`
-- `aeroform destroy --confirm`
-
-## Quick Start (Pro Mode)
-
-1. Prepare a `config.yaml` from `config.yaml.example`.
-2. Run planning and generation commands.
+### Simple Mode
 
 ```bash
-go run . plan "resilient kubernetes platform with private database"
-go run . generate "resilient kubernetes platform with private database"
-go run . scan
-go run . drift "resilient kubernetes platform with private database"
+# 1. Install
+go install github.com/momo-s15/aeroform@latest
+
+# 2. Setup AI backend
+aeroform setup
+
+# 3. Deploy
+aeroform launch
 ```
 
-Common Pro Mode commands:
+Aeroform asks what you want to build, picks a template, shows costs, and deploys.
 
-- `aeroform bootstrap`
-- `aeroform plan "..."`
-- `aeroform generate "..."`
-- `aeroform scan`
-- `aeroform drift "..."`
+</td>
+<td width="50%" valign="top">
+
+### Pro Mode
+
+```bash
+# 1. Install
+go install github.com/momo-s15/aeroform@latest
+
+# 2. Create config
+aeroform init
+
+# 3. Preview
+aeroform plan "kubernetes cluster with database"
+
+# 4. Deploy
+aeroform generate "kubernetes cluster with database"
+```
+
+</td>
+</tr>
+</table>
+
+**Prerequisites:** [Go 1.21+](https://go.dev/dl/) | [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
+
+---
+
+## How It Works
+
+```
+You: "I want a portfolio website"
+                │
+                ▼
+        ┌───────────────┐
+        │  Local LLM    │  Selects from validated templates
+        │  (Ollama)     │  (never generates raw Terraform)
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │  Security     │  Auto-correction + Checkov scan
+        │  Gate         │  Blocks unsafe configurations
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │  Cost         │  Estimate before you spend
+        │  Estimate     │  Free-tier aware
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │  Terraform    │  init → plan → apply
+        │  Deploy       │  With confirmation prompt
+        └───────────────┘
+```
+
+The LLM is a **selection** mechanism, not a generation mechanism. It picks from pre-validated, security-hardened templates. This means every deployment uses reviewed Terraform that passes security scanning — even with a small local model.
+
+---
+
+## Templates
+
+### Simple Mode — 14 templates across 3 clouds
+
+<table>
+<tr><th>AWS</th><th>Cost</th><th>Azure</th><th>Cost</th><th>GCP</th><th>Cost</th></tr>
+<tr><td>static-site</td><td>$0.50</td><td>static-site</td><td>$1.00</td><td>static-site</td><td>$0.50</td></tr>
+<tr><td>contact-form</td><td>$0.50</td><td>function-api</td><td>$0.00</td><td>cloud-run-api</td><td>$0.00</td></tr>
+<tr><td>lambda-api</td><td>$0.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>tiny-db</td><td>$14.99</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>discord-bot</td><td>$8.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>game-server</td><td>$30.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>fullstack-app</td><td>$15.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>file-upload</td><td>$0.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>url-shortener</td><td>$0.00</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>cron-job</td><td>$0.00</td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+### Pro Mode — 18 templates across 3 clouds
+
+| AWS | Cost | Azure | Cost | GCP | Cost |
+|-----|------|-------|------|-----|------|
+| vpc | $32.40 | vnet | $0.00 | vpc | $32.40 |
+| eks | $73.00 | aks | $73.00 | gke | $73.00 |
+| rds-private | $15.00 | cosmos-db | $25.00 | cloudsql | $7.67 |
+| s3-private | $0.50 | app-service | $13.14 | gcs | $0.50 |
+| alb | $22.00 | storage | $1.00 | | |
+| lambda-api | $0.00 | key-vault | $0.03 | | |
+| ecs-fargate | $36.00 | | | | |
+| cloudfront-api | $1.00 | | | | |
+
+Costs are estimates for the smallest viable configuration. Many templates are free-tier friendly.
+
+See the full [Template Reference](docs/template-reference.md) for resource details.
+
+---
+
+## Free Local AI
+
+Aeroform uses [Ollama](https://ollama.com) by default — a local LLM that runs on your machine. No API keys, no cloud costs, no data leaving your laptop.
+
+```bash
+aeroform setup              # installs llama3.2 (~2GB)
+aeroform setup --model mistral  # or pick a different model
+```
+
+Also supports [OpenAI](docs/llm-backends.md#openai) and [AWS Bedrock](docs/llm-backends.md#aws-bedrock) for teams that prefer cloud-hosted models.
+
+---
+
+## Security
+
+Every deployment passes through a security gate before Terraform runs.
+
+| Feature | Simple Mode | Pro Mode |
+|---------|------------|----------|
+| Auto-correction | Yes (encryption, HTTPS, private DB) | — |
+| Checkov scan | Yes (if installed) | Required |
+| tfsec scan | — | Yes (if installed) |
+| Custom policies | — | `aeroform policy add check.py` |
+| Gate behavior | Blocks HIGH severity | Blocks any failure |
+| Finding format | Plain English | Technical scanner output |
+
+All templates are pre-hardened: encryption at rest, public access blocked, least-privilege IAM, TLS enforced.
+
+Read more in the [Security Model](docs/security-model.md) docs.
+
+---
+
+## Key Commands
+
+| Command | Mode | What it does |
+|---------|------|-------------|
+| `aeroform setup` | Both | Install and verify local AI backend |
+| `aeroform launch` | Simple | Guided deploy from plain English |
+| `aeroform status` | Simple | Show tracked projects |
+| `aeroform cost` | Simple | Show estimated monthly spend |
+| `aeroform destroy --confirm` | Simple | Tear down tracked projects |
+| `aeroform init` | Pro | Scaffold config.yaml |
+| `aeroform bootstrap --repo` | Pro | Generate OIDC + state backend setup |
+| `aeroform plan "prompt"` | Pro | Dry-run: select, scan, plan |
+| `aeroform generate "prompt"` | Pro | Full pipeline: scan, plan, apply |
+| `aeroform scan` | Pro | Standalone security scan |
+| `aeroform drift <project>` | Both | Detect infrastructure drift |
+| `aeroform env add <name>` | Pro | Create environment workspace |
+| `aeroform policy add <file>` | Pro | Add custom Checkov policy |
+
+---
 
 ## Upgrade Path
 
-When a Simple Mode project grows, generate a Pro config:
+When a Simple Mode project outgrows guided deployment:
 
 ```bash
-go run . upgrade
-go run . upgrade --confirm
+aeroform upgrade           # preview the generated config
+aeroform upgrade --confirm # write config.yaml and enable Pro Mode
 ```
 
-The second command writes `config.yaml` (or a custom output path) and enables Pro Mode workflows.
+Same templates, same security, more control.
 
-## Project Layout
+---
 
-Key directories:
+## Project Structure
 
-- `cmd/` command entrypoints
-- `internal/config/` config loading and validation
-- `internal/engine/` planning and mode logic
-- `internal/providers/` cloud-specific behavior
-- `internal/security/` security gates and scanner integration
-- `internal/prompt/` constrained prompt builders
-- `internal/llm/` local AI client interfaces
+```
+aeroform/
+├── cmd/                    Cobra command definitions
+├── internal/
+│   ├── config/             Viper config loading + validation
+│   ├── cost/               Cost estimation (Simple + Pro, per-cloud)
+│   ├── engine/             Simple/Pro planners, drift detection
+│   ├── llm/                Ollama, OpenAI, Bedrock backends
+│   ├── logger/             Zap structured logging
+│   ├── providers/          AWS, Azure, GCP implementations
+│   ├── security/           Scanning, auto-correction, policies
+│   ├── terraform/          Renderer, runner, workspace mgmt
+│   └── ui/                 Colored terminal output
+├── bootstrap/              Cloud OIDC + state bootstrap
+├── templates/
+│   ├── simple/{cloud}/     14 Simple Mode templates
+│   └── pro/{cloud}/        18 Pro Mode templates
+├── docs/                   Full documentation site
+└── test/
+    ├── integration/        LocalStack-based tests
+    └── e2e/                Real cloud deploy/destroy tests
+```
 
-## Multi-Cloud Support
+---
 
-Provider abstractions exist for:
+## Documentation
 
-- AWS
-- Azure
-- GCP
+| Page | Description |
+|------|-------------|
+| [Getting Started — Simple](docs/getting-started-simple.md) | Install to deployed website in 5 minutes |
+| [Getting Started — Pro](docs/getting-started-pro.md) | Config to EKS cluster with security gating |
+| [Template Reference](docs/template-reference.md) | All 32 templates with resources and costs |
+| [LLM Backends](docs/llm-backends.md) | Ollama, OpenAI, Bedrock setup |
+| [Security Model](docs/security-model.md) | Scanning, policies, auto-correction |
+| [Architecture Decisions](docs/architecture-decisions.md) | Design rationale and trade-offs |
 
-Each provider exposes region handling, Pro template support, and bootstrap guidance.
-
-## Security Model
-
-- Simple Mode blocks known unsafe behavior and applies auto-corrections for low-risk issues.
-- Pro Mode integrates Checkov and tfsec when available and enforces scan gating on failure.
-- Security reporting is plain language in Simple Mode and explicit scan status in Pro Mode.
+---
 
 ## Contributing
 
-See `CONTRIBUTING.md` for contribution workflow, expectations, and first-issue guidance.
+We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow, expectations, and good first issues.
 
-## Responsible Disclosure
+## Security
 
-See `SECURITY.md` for how to report vulnerabilities responsibly.
+For vulnerability reports, see [SECURITY.md](SECURITY.md).
 
-## First GitHub Prototype Release
+## License
 
-Suggested first release checklist:
-
-- Run `go test ./...`
-- Confirm `go run . launch` and `go run . plan "..."` both run locally
-- Push to `main`
-- Create tag `v0.1.0-prototype`
-- Publish a GitHub Release with short demo notes and known limitations
+Apache 2.0 — see [LICENSE](LICENSE).

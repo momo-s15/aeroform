@@ -3,47 +3,76 @@ package cost
 import (
 	"fmt"
 	"sort"
+
+	"github.com/shopspring/decimal"
 )
+
+var domainFee = decimal.NewFromFloat(0.50)
+var defaultBudget = decimal.NewFromFloat(20.00)
 
 type Estimate struct {
 	Template     string
-	Monthly      float64
+	Monthly      decimal.Decimal
 	Lines        []string
 	OverBudget   bool
-	Budget       float64
+	Budget       decimal.Decimal
 	HasDomainFee bool
 }
 
-func EstimateForSimpleTemplate(template string, hasCustomDomain bool, budget float64) Estimate {
-	info, ok := simpleTemplateCosts[template]
+func EstimateForSimpleTemplate(provider, template string, hasCustomDomain bool, budget float64) Estimate {
+	info, ok := lookupSimpleCost(provider, template)
 	if !ok {
-		info = TemplateCost{Monthly: 0.00, Note: "unknown template, cost not estimated"}
+		info = TemplateCost{Monthly: decimal.NewFromInt(0), Note: "unknown template, cost not estimated"}
 	}
 
 	total := info.Monthly
-	lines := []string{fmt.Sprintf("%s: $%.2f (%s)", template, info.Monthly, info.Note)}
+	lines := []string{fmt.Sprintf("%s: $%s (%s)", template, info.Monthly.StringFixed(2), info.Note)}
 	if hasCustomDomain {
-		total += 0.50
-		lines = append(lines, "Route 53 hosted zone: $0.50 (custom domain)")
+		total = total.Add(domainFee)
+		lines = append(lines, "DNS hosted zone: $0.50 (custom domain)")
 	}
 
-	if budget <= 0 {
-		budget = 20.00
+	budgetDec := decimal.NewFromFloat(budget)
+	if budgetDec.LessThanOrEqual(decimal.Zero) {
+		budgetDec = defaultBudget
 	}
 
 	return Estimate{
 		Template:     template,
 		Monthly:      total,
 		Lines:        lines,
-		OverBudget:   total > budget,
-		Budget:       budget,
+		OverBudget:   total.GreaterThan(budgetDec),
+		Budget:       budgetDec,
 		HasDomainFee: hasCustomDomain,
 	}
 }
 
+func lookupSimpleCost(provider, template string) (TemplateCost, bool) {
+	if provider == "" {
+		provider = "aws"
+	}
+	table, ok := simpleTemplateCosts[provider]
+	if !ok {
+		return TemplateCost{}, false
+	}
+	info, ok := table[template]
+	return info, ok
+}
+
 func SupportedSimpleTemplates() []string {
-	templates := make([]string, 0, len(simpleTemplateCosts))
-	for name := range simpleTemplateCosts {
+	return SupportedSimpleTemplatesForProvider("aws")
+}
+
+func SupportedSimpleTemplatesForProvider(provider string) []string {
+	if provider == "" {
+		provider = "aws"
+	}
+	table, ok := simpleTemplateCosts[provider]
+	if !ok {
+		return nil
+	}
+	templates := make([]string, 0, len(table))
+	for name := range table {
 		templates = append(templates, name)
 	}
 	sort.Strings(templates)

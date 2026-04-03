@@ -5,6 +5,6 @@ import (
 	"github.com/momo-s15/aeroform/internal/config"
 )
 
-func Run(cfg config.Config) bootstrap.Report {
-	return bootstrap.Run(cfg)
+func Run(cfg config.Config, params bootstrap.Params) bootstrap.Report {
+	return bootstrap.Run(cfg, params)
 }

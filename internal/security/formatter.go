@@ -3,26 +3,35 @@ package security
 import (
 	"fmt"
 	"io"
+
+	"github.com/momo-s15/aeroform/internal/ui"
 )
 
 func PrintSimpleReport(out io.Writer, report Report) {
 	if !report.HasFindings {
-		fmt.Fprintln(out, "Security check: no issues found")
+		ui.Successln(out, "✓ Security check: no issues found")
 		return
 	}
 
-	fmt.Fprintln(out, "Security check")
+	ui.Boldln(out, "Security check")
 	for _, finding := range report.Findings {
-		fmt.Fprintf(out, "- [%s] %s\n", finding.Severity, finding.Title)
-		fmt.Fprintf(out, "  %s\n", finding.Description)
+		switch finding.Severity {
+		case SeverityHigh:
+			ui.Error(out, "  ✗ [%s] %s\n", finding.Severity, finding.Title)
+		case SeverityMedium:
+			ui.Warn(out, "  ⚠ [%s] %s\n", finding.Severity, finding.Title)
+		default:
+			ui.Info(out, "  ℹ [%s] %s\n", finding.Severity, finding.Title)
+		}
+		fmt.Fprintf(out, "    %s\n", finding.Description)
 		if finding.Fix != "" {
-			fmt.Fprintf(out, "  Fix: %s\n", finding.Fix)
+			fmt.Fprintf(out, "    Fix: %s\n", finding.Fix)
 		}
 	}
 	if len(report.AutoCorrected) > 0 {
-		fmt.Fprintln(out, "Auto-corrected")
+		ui.Successln(out, "Auto-corrected")
 		for _, item := range report.AutoCorrected {
-			fmt.Fprintf(out, "- %s\n", item)
+			ui.Success(out, "  ✓ %s\n", item)
 		}
 	}
 }

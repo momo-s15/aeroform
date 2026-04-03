@@ -49,15 +49,13 @@ func EvaluateSimplePlan(plan engine.SimpleLaunchPlan) Report {
 		report.WasAutoFixed = true
 	}
 
-	if plan.Template == "tiny-db" {
+	if plan.Template == "tiny-db" || plan.Template == "fullstack-app" {
 		report.Findings = append(report.Findings, Finding{
-			Severity:    SeverityHigh,
-			Title:       "Public database risk",
-			Description: "Simple Mode never deploys a public database. A database must remain private, encrypted, and behind a controlled access path.",
-			Fix:         "Use a private database pattern or switch to a serverless data store for Simple Mode.",
-			Blocking:    true,
+			Severity:    SeverityLow,
+			Title:       "Database security enforced",
+			Description: "This template includes a database. Aeroform will auto-correct any insecure settings (public access, unencrypted storage) after rendering.",
+			Fix:         "No action needed — autocorrect runs before deployment.",
 		})
-		report.BlockingCount++
 	}
 
 	if plan.CustomDomain != "" {
@@ -69,12 +67,13 @@ func EvaluateSimplePlan(plan engine.SimpleLaunchPlan) Report {
 		})
 	}
 
-	if strings.TrimSpace(plan.Provider) != "aws" {
+	supportedProviders := map[string]bool{"aws": true, "azure": true, "gcp": true}
+	if !supportedProviders[strings.TrimSpace(plan.Provider)] {
 		report.Findings = append(report.Findings, Finding{
 			Severity:    SeverityHigh,
 			Title:       "Unsupported provider for Simple Mode",
-			Description: fmt.Sprintf("Simple Mode currently supports AWS only, but %q was requested.", plan.Provider),
-			Fix:         "Choose AWS for the first Simple Mode release.",
+			Description: fmt.Sprintf("Simple Mode supports aws, azure, and gcp, but %q was requested.", plan.Provider),
+			Fix:         "Choose aws, azure, or gcp.",
 			Blocking:    true,
 		})
 		report.BlockingCount++

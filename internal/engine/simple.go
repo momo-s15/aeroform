@@ -38,18 +38,22 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 	if provider == "" {
 		provider = "aws"
 	}
-	if provider != "aws" {
-		return SimpleLaunchPlan{}, fmt.Errorf("simple launch is only implemented for aws in this phase")
+	supportedProviders := map[string]bool{"aws": true, "azure": true, "gcp": true}
+	if !supportedProviders[provider] {
+		return SimpleLaunchPlan{}, fmt.Errorf("unsupported provider %q; choose aws, azure, or gcp", provider)
 	}
 
-	template := SelectSimpleTemplate(input.Prompt)
+	available := cost.SupportedSimpleTemplatesForProvider(provider)
+	template := SelectSimpleTemplateForProvider(input.Prompt, provider)
+
 	if client != nil {
-		selectionPrompt := prompt.BuildSimplePrompt(input.Prompt, provider, "us-east-1", cost.SupportedSimpleTemplates())
-		selection, err := llm.GenerateTemplateSelection(client, selectionPrompt, cost.SupportedSimpleTemplates())
+		selectionPrompt := prompt.BuildSimplePrompt(input.Prompt, provider, "us-east-1", available)
+		selection, err := llm.GenerateTemplateSelection(client, selectionPrompt, available)
 		if err == nil && len(selection.Templates) > 0 {
 			template = selection.Templates[0]
 		}
 	}
+
 	projectName := strings.TrimSpace(input.ProjectName)
 	if projectName == "" {
 		projectName = Slugify(input.Prompt)
@@ -59,7 +63,7 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 	}
 
 	templateDir := filepath.ToSlash(filepath.Join("templates", "simple", provider, template))
-	costEstimate := cost.EstimateForSimpleTemplate(template, strings.TrimSpace(input.CustomDomain) != "", 20)
+	costEstimate := cost.EstimateForSimpleTemplate(provider, template, strings.TrimSpace(input.CustomDomain) != "", 20)
 
 	return SimpleLaunchPlan{
 		Provider:     provider,
@@ -83,14 +87,62 @@ func DefaultSimpleLLMClient() llm.Client {
 }
 
 func SelectSimpleTemplate(prompt string) string {
-	value := strings.ToLower(prompt)
+	return SelectSimpleTemplateForProvider(prompt, "aws")
+}
+
+func SelectSimpleTemplateForProvider(userPrompt, provider string) string {
+	value := strings.ToLower(userPrompt)
+
+	switch provider {
+	case "azure":
+		return selectAzureTemplate(value)
+	case "gcp":
+		return selectGCPTemplate(value)
+	default:
+		return selectAWSTemplate(value)
+	}
+}
+
+func selectAWSTemplate(value string) string {
 	switch {
 	case strings.Contains(value, "contact"):
 		return "contact-form"
-	case strings.Contains(value, "api"), strings.Contains(value, "backend"), strings.Contains(value, "lambda"):
+	case strings.Contains(value, "discord") || strings.Contains(value, "bot"):
+		return "discord-bot"
+	case strings.Contains(value, "game") || strings.Contains(value, "minecraft") || strings.Contains(value, "server"):
+		return "game-server"
+	case strings.Contains(value, "fullstack") || strings.Contains(value, "full-stack") || strings.Contains(value, "full stack"):
+		return "fullstack-app"
+	case strings.Contains(value, "upload") || strings.Contains(value, "file"):
+		return "file-upload"
+	case strings.Contains(value, "short") || strings.Contains(value, "url"):
+		return "url-shortener"
+	case strings.Contains(value, "cron") || strings.Contains(value, "schedule") || strings.Contains(value, "scheduled"):
+		return "cron-job"
+	case strings.Contains(value, "api") || strings.Contains(value, "backend") || strings.Contains(value, "lambda"):
 		return "lambda-api"
-	case strings.Contains(value, "database"), strings.Contains(value, "db"):
+	case strings.Contains(value, "database") || strings.Contains(value, "db"):
 		return "tiny-db"
+	default:
+		return "static-site"
+	}
+}
+
+func selectAzureTemplate(value string) string {
+	switch {
+	case strings.Contains(value, "api") || strings.Contains(value, "backend") ||
+		strings.Contains(value, "function") || strings.Contains(value, "serverless"):
+		return "function-api"
+	default:
+		return "static-site"
+	}
+}
+
+func selectGCPTemplate(value string) string {
+	switch {
+	case strings.Contains(value, "api") || strings.Contains(value, "backend") ||
+		strings.Contains(value, "container") || strings.Contains(value, "cloud run"):
+		return "cloud-run-api"
 	default:
 		return "static-site"
 	}

@@ -1,10 +1,34 @@
 # Integration Tests
 
-This directory holds slower integration tests for PR validation.
+Integration tests run against LocalStack (AWS emulator) and validate the full
+pipeline from template selection through Terraform plan.
 
-Blueprint coverage targets:
+## Prerequisites
 
-- Simple Mode launch pipeline
-- Pro Mode scan gating
-- LLM self-correction behavior
-- Cloud simulator integrations
+- Docker (for LocalStack)
+- Terraform CLI
+- Go 1.24+
+
+## Running locally
+
+```bash
+# Start LocalStack + run tests + stop LocalStack
+make integration
+
+# Or manually:
+docker compose up -d --wait
+go test -tags integration -timeout 300s -v ./test/integration/...
+docker compose down
+```
+
+## What's tested
+
+- **Simple Mode pipeline**: template selection, security gate, render, tfvars, terraform init+plan
+- **Pro Mode pipeline**: VPC template render, terraform init+plan, cost estimation
+- **Security gate**: Checkov scan blocks bad templates, passes good ones
+- **Cost estimation**: all simple templates return valid cost breakdowns
+
+## CI
+
+The `integration` job in `.github/workflows/ci.yml` runs these tests automatically
+using GitHub Actions service containers (LocalStack).

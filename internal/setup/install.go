@@ -2,9 +2,13 @@ package setup
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"runtime"
 )
+
+const DefaultModel = "llama3.2"
 
 func InstallOllama() error {
 	return InstallOllamaForPlatform(runtime.GOOS)
@@ -30,6 +34,25 @@ func InstallOllamaForPlatform(platform string) error {
 	default:
 		return fmt.Errorf("unsupported platform %q", platform)
 	}
+}
+
+// PullModel runs `ollama pull <model>` and streams progress to the given writer.
+// If w is nil, output goes to os.Stdout.
+func PullModel(model string, w io.Writer) error {
+	if model == "" {
+		model = DefaultModel
+	}
+	if w == nil {
+		w = os.Stdout
+	}
+
+	cmd := exec.Command("ollama", "pull", model)
+	cmd.Stdout = w
+	cmd.Stderr = w
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("ollama pull %s: %w", model, err)
+	}
+	return nil
 }
 
 func InstallInstructions(platform string) string {

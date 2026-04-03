@@ -1,0 +1,10 @@
+name: url-shortener
+mode: simple
+description: "URL shortener with Lambda, API Gateway, DynamoDB, and CloudFront"
+cost_estimate: "$0/month on AWS free tier"
+required_params:
+  - project_name
+optional_params:
+  - custom_domain
+free_tier: true
+audience: student

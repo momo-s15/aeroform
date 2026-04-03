@@ -25,7 +25,11 @@ type ProScanReport struct {
 }
 
 func RunProSecurityScan(terraformDir string) ProScanReport {
-	checkov := runTool("checkov", []string{"-d", terraformDir})
+	checkovArgs := []string{"-d", terraformDir}
+	if HasCustomPolicies() {
+		checkovArgs = append(checkovArgs, "--external-checks-dir", PolicyDir)
+	}
+	checkov := runTool("checkov", checkovArgs)
 	tfsec := runTool("tfsec", []string{terraformDir})
 
 	report := ProScanReport{

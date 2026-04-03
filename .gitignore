@@ -21,6 +21,7 @@ coverage.out
 **/.terraform/
 **/*.tfstate
 **/*.tfstate.*
+.aeroform/
 
 # Local environment/config secrets
 .env

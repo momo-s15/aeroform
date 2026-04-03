@@ -1,17 +1,20 @@
 package cmd
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/momo-s15/aeroform/internal/engine"
 	"github.com/momo-s15/aeroform/internal/llm"
+	"github.com/momo-s15/aeroform/internal/logger"
 	"github.com/momo-s15/aeroform/internal/security"
 	"github.com/momo-s15/aeroform/internal/simplestate"
+	"github.com/momo-s15/aeroform/internal/terraform"
+	"github.com/momo-s15/aeroform/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -19,59 +22,148 @@ var launchCmd = &cobra.Command{
 	Use:   "launch",
 	Short: "Launch a guided Simple Mode deployment",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		log := logger.L()
 		mode := engine.DetectMode("config.yaml", engine.Flags{})
 		if mode == engine.ProMode {
-			return errors.New("pro mode is not implemented yet; remove config.yaml or wait for the next phase")
+			return errors.New("launch is for Simple Mode; use 'aeroform generate' for Pro Mode")
 		}
 
-		plan, err := gatherSimpleLaunchPlan(cmd)
+		out := cmd.OutOrStdout()
+
+		plan, err := gatherSimpleLaunchPlan()
 		if err != nil {
 			return err
 		}
 
 		report := security.EvaluateSimplePlan(plan)
-		security.PrintSimpleReport(cmd.OutOrStdout(), report)
+		security.PrintSimpleReport(out, report)
 		if report.BlockingCount > 0 {
 			return errors.New("simple mode security gate blocked this launch; fix the issues above and try again")
 		}
-
 		plan = report.CorrectedPlan
+
+		printSimpleLaunchSummary(out, plan)
+
+		proceed, err := uiConfirm("Continue with deployment")
+		if err != nil {
+			return err
+		}
+		if !proceed {
+			fmt.Fprintln(out, "Launch cancelled.")
+			return nil
+		}
+
+		if err := terraform.EnsureBinary(); err != nil {
+			return err
+		}
+
+		workDir := filepath.Join(".aeroform", "projects", plan.ProjectName)
+		log.Debugw("rendering template", "template", plan.Template, "workDir", workDir)
+		fmt.Fprintf(out, "\n-> Rendering template %s into %s\n", plan.Template, workDir)
+		if err := terraform.RenderTemplate(plan.TemplateDir, nil, workDir); err != nil {
+			return fmt.Errorf("render template: %w", err)
+		}
+
+		vars := map[string]string{
+			"project_name": plan.ProjectName,
+			"region":       "us-east-1",
+		}
+		if plan.CustomDomain != "" {
+			vars["custom_domain"] = plan.CustomDomain
+		}
+		if err := terraform.GenerateTfvars(vars, workDir); err != nil {
+			return fmt.Errorf("generate tfvars: %w", err)
+		}
+
+		corrections, err := security.AutoCorrect(workDir)
+		if err != nil {
+			return fmt.Errorf("security autocorrect: %w", err)
+		}
+		if len(corrections) > 0 {
+			fmt.Fprintln(out, "-> Security auto-corrections applied:")
+			for _, c := range corrections {
+				fmt.Fprintf(out, "   [%s] %s (%s)\n", c.Rule, c.Description, c.File)
+			}
+		}
+
+		fmt.Fprintln(out, "-> Running terraform init...")
+		if err := terraform.Init(workDir); err != nil {
+			return err
+		}
+
+		fmt.Fprintln(out, "-> Running terraform plan...")
+		planResult, err := terraform.Plan(workDir)
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "   Plan: %d to add, %d to change, %d to destroy.\n",
+			planResult.AddCount, planResult.ChangeCount, planResult.DestroyCount)
+
+		applyOk, err := uiConfirm("Apply this plan")
+		if err != nil {
+			return err
+		}
+		if !applyOk {
+			fmt.Fprintln(out, "Apply cancelled. Your plan is saved — run 'aeroform launch' again to resume.")
+			return nil
+		}
+
+		fmt.Fprintln(out, "-> Deploying...")
+		log.Debugw("running terraform apply", "workDir", workDir)
+		if err := terraform.Apply(workDir, true); err != nil {
+			return err
+		}
+		log.Debug("terraform apply completed successfully")
+
 		if err := simplestate.AddProject(simplestate.Project{
 			Name:            plan.ProjectName,
 			Provider:        plan.Provider,
 			Template:        plan.Template,
 			Prompt:          plan.Prompt,
 			CustomDomain:    plan.CustomDomain,
-			MonthlyEstimate: plan.Cost.Monthly,
+			MonthlyEstimate: plan.Cost.Monthly.InexactFloat64(),
+			WorkDir:         workDir,
 			CreatedAt:       time.Now().UTC(),
 		}); err != nil {
 			return err
 		}
 
-		return printSimpleLaunchPlan(cmd.OutOrStdout(), plan)
+		fmt.Fprintln(out, "")
+		ui.Successln(out, "✓ Done! Your infrastructure is live.")
+		outputs, err := terraform.Output(workDir)
+		if err == nil && outputs != "" {
+			fmt.Fprintln(out, "")
+			ui.Boldln(out, "Outputs:")
+			fmt.Fprintln(out, outputs)
+		}
+
+		return nil
 	},
 }
 
-func gatherSimpleLaunchPlan(cmd *cobra.Command) (engine.SimpleLaunchPlan, error) {
-	reader := bufio.NewReader(cmd.InOrStdin())
-	out := cmd.OutOrStdout()
-
-	request, err := askPrompt(reader, out, "What do you want to launch?", "a personal website")
+func gatherSimpleLaunchPlan() (engine.SimpleLaunchPlan, error) {
+	request, err := uiPrompt("What do you want to launch", "a personal website", validateNotEmpty)
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
 	}
 
-	provider, err := askPrompt(reader, out, "Which cloud provider do you want to use? [aws available now]", "aws")
+	providerChoices := []string{"aws", "azure", "gcp"}
+	selected, err := uiSelect("Cloud provider", providerChoices)
+	if err != nil {
+		return engine.SimpleLaunchPlan{}, err
+	}
+	provider := strings.Fields(selected)[0]
+
+	defaultSlug := engine.Slugify(request)
+	if validateSlug(defaultSlug) != nil {
+		defaultSlug = "my-project"
+	}
+	projectName, err := uiPrompt("Project name", defaultSlug, validateSlug)
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
 	}
 
-	projectName, err := askPrompt(reader, out, "What should we call this project?", engine.Slugify(request))
-	if err != nil {
-		return engine.SimpleLaunchPlan{}, err
-	}
-
-	customDomain, err := askOptionalPrompt(reader, out, "Custom domain (optional)")
+	customDomain, err := uiPromptOptional("Custom domain (leave blank to skip)")
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
 	}
@@ -97,58 +189,24 @@ func llmClientForSimpleMode() llm.Client {
 	return nil
 }
 
-func askPrompt(reader *bufio.Reader, out io.Writer, question string, defaultValue string) (string, error) {
-	fmt.Fprintf(out, "%s\n", question)
-	if defaultValue != "" {
-		fmt.Fprintf(out, "[%s] ", defaultValue)
-	} else {
-		fmt.Fprint(out, "> ")
-	}
-
-	line, err := reader.ReadString('\n')
-	if err != nil && !errors.Is(err, io.EOF) {
-		return "", err
-	}
-	line = strings.TrimSpace(line)
-	if line == "" {
-		return defaultValue, nil
-	}
-	return line, nil
-}
-
-func askOptionalPrompt(reader *bufio.Reader, out io.Writer, question string) (string, error) {
-	fmt.Fprintf(out, "%s\n", question)
-	fmt.Fprint(out, "> ")
-	line, err := reader.ReadString('\n')
-	if err != nil && !errors.Is(err, io.EOF) {
-		return "", err
-	}
-	return strings.TrimSpace(line), nil
-}
-
-func printSimpleLaunchPlan(out io.Writer, plan engine.SimpleLaunchPlan) error {
+func printSimpleLaunchSummary(out io.Writer, plan engine.SimpleLaunchPlan) {
 	fmt.Fprintln(out, "")
-	fmt.Fprintln(out, "Aeroform Simple Mode launch")
+	ui.Boldln(out, "Aeroform Simple Mode launch")
 	for _, line := range plan.Summary {
-		fmt.Fprintln(out, line)
+		fmt.Fprintln(out, "  "+line)
 	}
 	fmt.Fprintln(out, "")
-	fmt.Fprintln(out, "Estimated monthly cost")
+	ui.Boldln(out, "Estimated monthly cost")
 	for _, line := range plan.Cost.Lines {
-		fmt.Fprintln(out, line)
+		fmt.Fprintln(out, "  "+line)
 	}
-	fmt.Fprintf(out, "total: $%.2f/month\n", plan.Cost.Monthly)
+	if plan.Cost.Monthly.IsZero() {
+		ui.Success(out, "  total: $%s/month (free tier)\n", plan.Cost.Monthly.StringFixed(2))
+	} else {
+		ui.Warn(out, "  total: $%s/month\n", plan.Cost.Monthly.StringFixed(2))
+	}
 	if plan.Cost.OverBudget {
-		fmt.Fprintf(out, "warning: this is over the $%.2f default budget\n", plan.Cost.Budget)
+		ui.Warn(out, "  ⚠ warning: this is over the $%s default budget\n", plan.Cost.Budget.StringFixed(2))
 	}
 	fmt.Fprintln(out, "")
-	fmt.Fprintln(out, "Next step")
-	fmt.Fprintf(out, "- template dir: %s\n", plan.TemplateDir)
-	fmt.Fprintf(out, "- project name: %s\n", plan.ProjectName)
-	if plan.CustomDomain != "" {
-		fmt.Fprintf(out, "- custom domain: %s\n", plan.CustomDomain)
-	}
-	fmt.Fprintln(out, "")
-	fmt.Fprintln(out, "Deployment is not wired yet; Phase 2 is now selecting templates and producing a costed launch plan.")
-	return nil
 }
