@@ -18,9 +18,9 @@ jobs:
           go-version-file: go.mod
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v9
+        # v7+ of the action only installs golangci-lint v2; keep v6 for v1.64.x + current .golangci.yml.
+        uses: golangci/golangci-lint-action@v6
         with:
-          # Pin v1.x until .golangci.yml is migrated for golangci-lint v2 (latest).
           version: v1.64.8
 
   test:

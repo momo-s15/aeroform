@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/momo-s15/aeroform/internal/engine"
@@ -15,7 +16,7 @@ func TestProVPCTemplatePlan(t *testing.T) {
 	ensureLocalStack(t)
 
 	provider := providers.ForCloud("aws")
-	templateDir := provider.GetTemplateDir(engine.ProMode, "vpc")
+	templateDir := filepath.Join(repoRoot(t), filepath.FromSlash(provider.GetTemplateDir(engine.ProMode, "vpc")))
 
 	workDir := t.TempDir()
 	sources := []terraform.ProTemplateSource{

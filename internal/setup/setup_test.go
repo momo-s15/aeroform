@@ -68,6 +68,12 @@ func TestOllamaAvailableWithFakeBinary(t *testing.T) {
 	if err := os.WriteFile(binaryPath, []byte("fake ollama"), 0o600); err != nil {
 		t.Fatalf("write fake binary: %v", err)
 	}
+	// Unix exec.LookPath ignores non-executable files; Windows does not require +x.
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(binaryPath, 0o755); err != nil {
+			t.Fatalf("chmod fake binary: %v", err)
+		}
+	}
 
 	originalPath := os.Getenv("PATH")
 	if err := os.Setenv("PATH", tempDir+string(os.PathListSeparator)+originalPath); err != nil {

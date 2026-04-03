@@ -6,8 +6,31 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
+
+// repoRoot returns the module root (directory containing go.mod). Integration tests run with
+// cwd set to the package directory, so relative paths like templates/... must be anchored here.
+func repoRoot(t *testing.T) string {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(1)
+	if !ok {
+		t.Fatal("runtime.Caller failed")
+	}
+	dir := filepath.Dir(file)
+	for {
+		st, err := os.Stat(filepath.Join(dir, "go.mod"))
+		if err == nil && !st.IsDir() {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatalf("go.mod not found above %s", file)
+		}
+		dir = parent
+	}
+}
 
 // writeLocalStackAWSProviderOverride writes a *_override.tf provider block so Terraform
 // talks to LocalStack in CI instead of real AWS (templates only set region by default).

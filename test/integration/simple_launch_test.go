@@ -4,6 +4,7 @@ package integration
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/momo-s15/aeroform/internal/cost"
@@ -32,7 +33,8 @@ func TestSimpleStaticSitePipeline(t *testing.T) {
 	}
 
 	workDir := t.TempDir()
-	if err := terraform.RenderTemplate(plan.TemplateDir, nil, workDir); err != nil {
+	templateDir := filepath.Join(repoRoot(t), filepath.FromSlash(plan.TemplateDir))
+	if err := terraform.RenderTemplate(templateDir, nil, workDir); err != nil {
 		t.Fatalf("RenderTemplate: %v", err)
 	}
 	writeLocalStackAWSProviderOverride(t, workDir)
