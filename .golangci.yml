@@ -1,42 +1,50 @@
+version: "2"
+
 run:
   timeout: 3m
   modules-download-mode: readonly
 
 linters:
+  default: none
   enable:
     - errcheck
     - govet
     - staticcheck
     - unused
-    - gosimple
     - ineffassign
-    - typecheck
     - gocritic
-    - gofmt
     - misspell
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-      - shadow
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - performance
-    disabled-checks:
-      - hugeParam
+  settings:
+    errcheck:
+      check-type-assertions: true
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+      disabled-checks:
+        - hugeParam
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+      - path: cmd/ui\.go
+        linters:
+          - errcheck
 
 issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-    - path: cmd/ui\.go
-      linters:
-        - errcheck
   max-issues-per-linter: 50
   max-same-issues: 5
+
+formatters:
+  enable:
+    - gofmt

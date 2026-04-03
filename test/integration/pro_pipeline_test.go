@@ -19,18 +19,13 @@ func TestProVPCTemplatePlan(t *testing.T) {
 	templateDir := filepath.Join(repoRoot(t), filepath.FromSlash(provider.GetTemplateDir(engine.ProMode, "vpc")))
 
 	workDir := t.TempDir()
-	sources := []terraform.ProTemplateSource{
-		{Name: "vpc", Dir: templateDir},
+	// Single-module render with substituted variables (RenderProProject root does not pass module inputs).
+	tfVars := map[string]string{
+		"name":       "aeroform-ci-vpc",
+		"cidr_block": "10.0.0.0/16",
 	}
-	vars := map[string]string{
-		"aws_region":     "us-east-1",
-		"aws_account_id": "000000000000",
-		"cloud":          "aws",
-		"mode":           "pro",
-	}
-
-	if err := terraform.RenderProProject(sources, vars, workDir); err != nil {
-		t.Fatalf("RenderProProject: %v", err)
+	if err := terraform.RenderTemplate(templateDir, tfVars, workDir); err != nil {
+		t.Fatalf("RenderTemplate: %v", err)
 	}
 	writeLocalStackAWSProviderOverride(t, workDir)
 

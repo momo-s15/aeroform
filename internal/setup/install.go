@@ -23,7 +23,7 @@ func InstallOllamaForPlatform(platform string) error {
 			cmd.Stderr = nil
 			return cmd.Run()
 		}
-		return fmt.Errorf("Homebrew is required for automatic Ollama installation on macOS")
+		return fmt.Errorf("homebrew is required for automatic Ollama installation on macOS")
 	case "linux":
 		cmd := exec.Command("sh", "-c", "curl -fsSL https://ollama.com/install.sh | sh")
 		cmd.Stdout = nil

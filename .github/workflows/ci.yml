@@ -18,10 +18,10 @@ jobs:
           go-version-file: go.mod
 
       - name: Lint
-        # v7+ of the action only installs golangci-lint v2; keep v6 for v1.64.x + current .golangci.yml.
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.64.8
+          # v1.x linters do not support Go 1.26; v2.9+ is required for this module toolchain.
+          version: v2.9.0
 
   test:
     runs-on: ubuntu-latest

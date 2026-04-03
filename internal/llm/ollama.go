@@ -60,7 +60,7 @@ func (c *OllamaClient) IsAvailable() bool {
 	if err != nil {
 		return false
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 	return response.StatusCode >= 200 && response.StatusCode < 500
 }
 
@@ -84,7 +84,7 @@ func (c *OllamaClient) Generate(prompt string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
