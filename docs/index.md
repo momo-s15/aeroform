@@ -2,7 +2,9 @@
 
 Aeroform is an open-source CLI tool that deploys cloud infrastructure using natural language. It supports AWS, Azure, and GCP through pre-validated, security-hardened Terraform templates.
 
-**Requirements:** [Go 1.26.1+](https://go.dev/dl/) (matches `go.mod` and CI), [Terraform](https://developer.hashicorp.com/terraform/install), and a supported LLM backend ([Ollama](https://ollama.com/download) by default). Pro Mode security gating expects [Checkov](https://www.checkov.io/) (and optionally [tfsec](https://github.com/aquasecurity/tfsec)) on your `PATH` when you run scans locally.
+**Install Aeroform:** use the **[installation guide](installation.md)** (curl install script for macOS/Linux, `go install` for Go users, Windows `.exe` from Releases; Homebrew planned for v1.1.0).
+
+**Runtime requirements:** [Terraform](https://developer.hashicorp.com/terraform/install) and a supported LLM backend ([Ollama](https://ollama.com/download) by default). Building from source needs [Go 1.26.1+](https://go.dev/dl/) (matches `go.mod` and CI). Pro Mode security gating expects [Checkov](https://www.checkov.io/) (and optionally [tfsec](https://github.com/aquasecurity/tfsec)) on your `PATH` when you run scans locally.
 
 **Two modes, one tool:**
 
@@ -12,7 +14,7 @@ Aeroform is an open-source CLI tool that deploys cloud infrastructure using natu
 ## Quick Start
 
 ```bash
-# Install
+# Install (macOS/Linux: curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | sh)
 go install github.com/momo-s15/aeroform@latest
 
 # Simple Mode — deploy a website in one command
@@ -29,6 +31,7 @@ aeroform generate "kubernetes cluster with database"
 
 | Guide | Audience | What you'll learn |
 |-------|----------|-------------------|
+| [Installation](installation.md) | Everyone | Install script, go install, Windows, future Homebrew |
 | [Getting Started — Simple](getting-started-simple.md) | Students, solo devs | Install to live website in 5 minutes |
 | [Getting Started — Pro](getting-started-pro.md) | Teams, DevOps | Config to EKS cluster with security gating |
 

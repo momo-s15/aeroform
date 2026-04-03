@@ -38,6 +38,9 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/aeroform-windows-amd64.exe .
           GOOS=windows GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/aeroform-windows-arm64.exe .
 
+      - name: SHA256 checksums
+        run: cd dist && sha256sum aeroform-* > checksums.txt
+
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2
         with:

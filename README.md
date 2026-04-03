@@ -39,7 +39,7 @@ Aeroform is an open-source CLI that turns plain English into cloud infrastructur
 ### Simple Mode
 
 ```bash
-# 1. Install
+# 1. Install (or: curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | sh)
 go install github.com/momo-s15/aeroform@latest
 
 # 2. Setup AI backend
@@ -57,7 +57,7 @@ Aeroform asks what you want to build, picks a template, shows costs, and deploys
 ### Pro Mode
 
 ```bash
-# 1. Install
+# 1. Install (or use install.sh — see Installation above)
 go install github.com/momo-s15/aeroform@latest
 
 # 2. Create config
@@ -74,9 +74,20 @@ aeroform generate "kubernetes cluster with database"
 </tr>
 </table>
 
-**Prerequisites:** [Go 1.26.1+](https://go.dev/dl/) | [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
+**Runtime prerequisites (after install):** [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
 
-**Pin a release (example):** `go install github.com/momo-s15/aeroform@v1.0.2` — or use `@latest`. Binaries are on [Releases](https://github.com/momo-s15/aeroform/releases).
+---
+
+## Installation
+
+| Method | Audience | Command / action |
+|--------|----------|------------------|
+| **1. Install script** (macOS / Linux) | Most users — no Go required | `curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh \| sh` |
+| **2. Homebrew** | Mac/Linux developers | *Planned v1.1.0* — tap + formula (see [docs/installation.md](docs/installation.md)) |
+| **3. go install** | Contributors / Go users | `go install github.com/momo-s15/aeroform@latest` (needs [Go 1.26.1+](https://go.dev/dl/)) |
+| **Windows** | All | Download `aeroform-windows-amd64.exe` or `aeroform-windows-arm64.exe` from [Releases](https://github.com/momo-s15/aeroform/releases) and add to `PATH` |
+
+Optional: pin a version with the script — `AEROFORM_VERSION=v1.0.2 curl -fsSL ... | sh`. Full detail: **[docs/installation.md](docs/installation.md)**.
 
 ---
 
@@ -248,6 +259,7 @@ aeroform/
 | Page | Description |
 |------|-------------|
 | [Documentation home](docs/index.md) | Overview, requirements, CI/contributing links |
+| [Installation](docs/installation.md) | Install script, Homebrew (planned), go install, Windows |
 | [Getting Started — Simple](docs/getting-started-simple.md) | Install to deployed website in 5 minutes |
 | [Getting Started — Pro](docs/getting-started-pro.md) | Config to EKS cluster with security gating |
 | [Template Reference](docs/template-reference.md) | All 32 templates with resources and costs |

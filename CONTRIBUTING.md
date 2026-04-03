@@ -4,6 +4,8 @@ Thanks for contributing to Aeroform.
 
 Keep pull requests **focused** (one feature or fix), **tested**, and consistent with existing style. For historical implementation context, see `AEROFORM_PLAN.md` and `aeroform_blueprint.md`.
 
+End-user install options are in [docs/installation.md](docs/installation.md) (curl `install.sh`, Releases, future Homebrew).
+
 ## What you need
 
 - **Go 1.26.1+** (match `go.mod` / `toolchain`; CI uses `go-version-file: go.mod`)

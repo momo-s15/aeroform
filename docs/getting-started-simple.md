@@ -6,14 +6,25 @@ Simple Mode is the guided path for students, solo developers, and anyone deployi
 
 | Tool | Why | Install |
 |------|-----|---------|
-| **Go 1.26.1+** | Build and run Aeroform (see `go.mod` / toolchain) | [go.dev/dl](https://go.dev/dl/) |
 | **Terraform** | Provisions cloud resources | [developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install) |
 | **Ollama** | Local LLM for template selection | [ollama.com/download](https://ollama.com/download) |
 | **AWS / Azure / GCP CLI** | Cloud authentication | See your cloud's docs |
 
+You do **not** need Go installed if you use the **install script** (macOS/Linux). To build from source or use `go install`, see [Go 1.26.1+](https://go.dev/dl/) on `go.mod`.
+
 Make sure you are authenticated with your chosen cloud provider before running Aeroform. For AWS, that means `aws configure` or environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`).
 
 ## Install Aeroform
+
+**Recommended (macOS / Linux, no Go):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | sh
+```
+
+See [installation.md](installation.md) for version pinning, custom paths, Windows, and Homebrew (planned).
+
+**From source (contributors):**
 
 ```bash
 git clone https://github.com/momo-s15/aeroform.git
@@ -21,7 +32,7 @@ cd aeroform
 go build -o aeroform .
 ```
 
-Or install directly:
+**Go install:**
 
 ```bash
 go install github.com/momo-s15/aeroform@latest
