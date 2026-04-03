@@ -35,6 +35,7 @@ func TestSimpleStaticSitePipeline(t *testing.T) {
 	if err := terraform.RenderTemplate(plan.TemplateDir, nil, workDir); err != nil {
 		t.Fatalf("RenderTemplate: %v", err)
 	}
+	writeLocalStackAWSProviderOverride(t, workDir)
 
 	vars := map[string]string{
 		"project_name": plan.ProjectName,

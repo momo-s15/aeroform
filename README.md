@@ -10,7 +10,7 @@
   <a href="https://github.com/momo-s15/aeroform/releases/latest"><img src="https://img.shields.io/github/v/release/momo-s15/aeroform?include_prereleases&sort=semver" alt="Release"></a>
   <a href="https://pkg.go.dev/github.com/momo-s15/aeroform"><img src="https://pkg.go.dev/badge/github.com/momo-s15/aeroform.svg" alt="Go Reference"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
-  <img src="https://img.shields.io/badge/go-%3E%3D1.21-00ADD8" alt="Go Version">
+  <img src="https://img.shields.io/badge/go-1.26+-00ADD8" alt="Go Version">
 </p>
 
 ---
@@ -73,7 +73,7 @@ aeroform generate "kubernetes cluster with database"
 </tr>
 </table>
 
-**Prerequisites:** [Go 1.21+](https://go.dev/dl/) | [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
+**Prerequisites:** [Go 1.26.1+](https://go.dev/dl/) | [Terraform](https://developer.hashicorp.com/terraform/install) | [Ollama](https://ollama.com/download) (for local AI) | Cloud CLI authenticated
 
 ---
 

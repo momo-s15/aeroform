@@ -7,7 +7,7 @@ pipeline from template selection through Terraform plan.
 
 - Docker (for LocalStack)
 - Terraform CLI
-- Go 1.24+
+- Go 1.26.1+
 
 ## Running locally
 

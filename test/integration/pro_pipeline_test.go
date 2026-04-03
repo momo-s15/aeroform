@@ -31,6 +31,7 @@ func TestProVPCTemplatePlan(t *testing.T) {
 	if err := terraform.RenderProProject(sources, vars, workDir); err != nil {
 		t.Fatalf("RenderProProject: %v", err)
 	}
+	writeLocalStackAWSProviderOverride(t, workDir)
 
 	if err := terraform.EnsureBinary(); err != nil {
 		t.Skipf("terraform not available: %v", err)

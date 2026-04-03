@@ -20,7 +20,8 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          # Pin v1.x until .golangci.yml is migrated for golangci-lint v2 (latest).
+          version: v1.64.8
 
   test:
     runs-on: ubuntu-latest
@@ -49,7 +50,7 @@ jobs:
           EAGER_SERVICE_LOADING: 1
           SKIP_SSL_CERT_DOWNLOAD: "1"
         options: >-
-          --health-cmd "curl -sf http://localhost:4566/_localstack/health || exit 1"
+          --health-cmd "curl -sf http://127.0.0.1:4566/_localstack/health || exit 1"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 30

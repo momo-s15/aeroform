@@ -8,7 +8,7 @@ normal CI.
 
 - Real AWS credentials (via env vars, profile, or OIDC role)
 - Terraform CLI
-- Go 1.24+
+- Go 1.26.1+
 
 ## Running locally
 
