@@ -26,18 +26,23 @@ Supported platforms: **linux/amd64**, **linux/arm64**, **darwin/amd64**, **darwi
 
 ---
 
-## 2. Homebrew (macOS / Linux — planned)
+## 2. Homebrew (macOS / Linux)
 
-Target experience (not wired yet — track as a **v1.1.0** milestone):
+Uses a separate tap repository (**[momo-s15/homebrew-aeroform](https://github.com/momo-s15/homebrew-aeroform)**). Once that repo exists and contains `Formula/aeroform.rb` (see **[homebrew-tap.md](homebrew-tap.md)** for the full setup checklist):
 
 ```bash
-brew install momo-s15/aeroform/aeroform
+brew tap momo-s15/aeroform
+brew install aeroform
 brew upgrade aeroform
 ```
 
-That requires a separate **Homebrew tap** repository (e.g. `homebrew-aeroform`) and a formula. [GoReleaser](https://goreleaser.com/) can publish the formula on each tag once the tap exists; see comments in [`.goreleaser.yaml`](../.goreleaser.yaml) in this repo for a starting point.
+One-liner equivalent:
 
-Until then, use the **install script** or **`go install`**.
+```bash
+brew install momo-s15/aeroform/aeroform
+```
+
+Until the tap is published, use the **install script** or **`go install`** above. Optional automation: [GoReleaser `brews`](https://goreleaser.com/) — comments in [`.goreleaser.yaml`](../.goreleaser.yaml).
 
 ---
 

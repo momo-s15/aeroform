@@ -24,7 +24,7 @@ For **Azure**, `aeroform launch` asks for an **Azure region**. Some subscription
 curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | sh
 ```
 
-See [installation.md](installation.md) for version pinning, custom paths, Windows, and Homebrew (planned).
+See [installation.md](installation.md) for version pinning, custom paths, Windows, and [Homebrew](homebrew-tap.md).
 
 **From source (contributors):**
 

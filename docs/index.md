@@ -2,7 +2,7 @@
 
 Aeroform is an open-source CLI tool that deploys cloud infrastructure using natural language. It supports AWS, Azure, and GCP through pre-validated, security-hardened Terraform templates.
 
-**Install Aeroform:** use the **[installation guide](installation.md)** (curl install script for macOS/Linux, `go install` for Go users, Windows `.exe` from Releases; Homebrew planned for v1.1.0).
+**Install Aeroform:** use the **[installation guide](installation.md)** (curl install script for macOS/Linux, optional [Homebrew tap](homebrew-tap.md), `go install` for Go users, Windows `.exe` from Releases).
 
 **Runtime requirements:** [Terraform](https://developer.hashicorp.com/terraform/install) and a supported LLM backend ([Ollama](https://ollama.com/download) by default). Building from source needs [Go 1.26.1+](https://go.dev/dl/) (matches `go.mod` and CI). Pro Mode security gating expects [Checkov](https://www.checkov.io/) (and optionally [tfsec](https://github.com/aquasecurity/tfsec)) on your `PATH` when you run scans locally.
 
@@ -31,7 +31,7 @@ aeroform generate "kubernetes cluster with database"
 
 | Guide | Audience | What you'll learn |
 |-------|----------|-------------------|
-| [Installation](installation.md) | Everyone | Install script, go install, Windows, future Homebrew |
+| [Installation](installation.md) | Everyone | Install script, Homebrew tap, go install, Windows |
 | [Getting Started — Simple](getting-started-simple.md) | Students, solo devs | Install to live website in 5 minutes |
 | [Getting Started — Pro](getting-started-pro.md) | Teams, DevOps | Config to EKS cluster with security gating |
 
@@ -39,6 +39,7 @@ aeroform generate "kubernetes cluster with database"
 
 | Page | What it covers |
 |------|----------------|
+| [Homebrew tap](homebrew-tap.md) | Maintainers: publish `brew install` via `homebrew-aeroform` |
 | [Template Reference](template-reference.md) | Every template (Simple + Pro, all clouds) with resources and costs |
 | [LLM Backends](llm-backends.md) | Setup for Ollama, OpenAI, and AWS Bedrock |
 | [Security Model](security-model.md) | Scanning, auto-correction, custom policies, drift detection |

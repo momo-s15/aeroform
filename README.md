@@ -71,7 +71,7 @@ aeroform generate "kubernetes cluster with database"
 | Method | Audience | Command / action |
 |--------|----------|------------------|
 | **1. Install script** (macOS / Linux) | Most users — no Go required | `curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh \| sh` |
-| **2. Homebrew** | Mac/Linux developers | *Planned v1.1.0* — tap + formula (see [docs/installation.md](docs/installation.md)) |
+| **2. Homebrew** | Mac/Linux developers | `brew tap momo-s15/aeroform` → `brew install aeroform` — setup: [docs/homebrew-tap.md](docs/homebrew-tap.md) |
 | **3. go install** | Contributors / Go users | `go install github.com/momo-s15/aeroform@latest` (needs [Go 1.26.1+](https://go.dev/dl/)) |
 | **Windows** | All | Download `aeroform-windows-amd64.exe` or `aeroform-windows-arm64.exe` from [Releases](https://github.com/momo-s15/aeroform/releases) and add to `PATH` |
 
@@ -247,7 +247,7 @@ aeroform/
 | Page | Description |
 |------|-------------|
 | [Documentation home](docs/index.md) | Overview, requirements, CI/contributing links |
-| [Installation](docs/installation.md) | Install script, Homebrew (planned), go install, Windows |
+| [Installation](docs/installation.md) | Install script, Homebrew tap, go install, Windows |
 | [Getting Started — Simple](docs/getting-started-simple.md) | Install to deployed website in 5 minutes |
 | [Getting Started — Pro](docs/getting-started-pro.md) | Config to EKS cluster with security gating |
 | [Template Reference](docs/template-reference.md) | All 32 templates with resources and costs |
