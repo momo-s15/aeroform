@@ -61,20 +61,24 @@ func resolveTemplateFS(templateDir string) (fs.FS, error) {
 		return nil, fmt.Errorf("empty template path after normalizing %q", templateDir)
 	}
 
+	// Default: embedded only. A ./templates tree in CWD (e.g. Downloads) must not
+	// override the binary after a failed embed read — that produced stale regexreplace HCL.
 	if !envUseDiskTemplates() {
-		if sub, err := openEmbedded(rel); err == nil {
-			return sub, nil
+		sub, err := openEmbedded(rel)
+		if err != nil {
+			return nil, fmt.Errorf("embedded template %q: %w (reinstall: go install github.com/momo-s15/aeroform@main)", rel, err)
 		}
+		return sub, nil
 	}
 
 	if fi, err := os.Stat(clean); err == nil && fi.IsDir() {
 		return os.DirFS(clean), nil
 	}
-
-	if sub, err := openEmbedded(rel); err == nil {
-		return sub, nil
+	sub, err := openEmbedded(rel)
+	if err != nil {
+		return nil, fmt.Errorf("template not on disk %s and embedded %q: %w", clean, rel, err)
 	}
-	return nil, fmt.Errorf("template not found on disk or embedded: %s (embed key %q)", clean, rel)
+	return sub, nil
 }
 
 func envUseDiskTemplates() bool {
