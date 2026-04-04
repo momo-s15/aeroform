@@ -1,4 +1,4 @@
-# aeroform-schema: azure-static-site/2
+# aeroform-schema: azure-static-site/3
 terraform {
   required_version = ">= 1.0"
 

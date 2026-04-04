@@ -270,7 +270,7 @@ func printSimpleLaunchSummary(out io.Writer, plan engine.SimpleLaunchPlan) {
 }
 
 // Marker in templates/simple/azure/static-site/main.tf — detects stale CLI or hand-edited copies.
-const azureStaticSiteSchemaMarker = "aeroform-schema: azure-static-site/2"
+const azureStaticSiteSchemaMarker = "aeroform-schema: azure-static-site/3"
 
 func checkAzureSimpleTemplateFresh(workDir string, plan engine.SimpleLaunchPlan) error {
 	if plan.Provider != "azure" || plan.Template != "static-site" {
@@ -280,7 +280,18 @@ func checkAzureSimpleTemplateFresh(workDir string, plan engine.SimpleLaunchPlan)
 	if err != nil {
 		return nil
 	}
-	if strings.Contains(string(b), azureStaticSiteSchemaMarker) {
+	s := string(b)
+	// Stale copies used regexreplace(), which many Terraform builds reject; catch before plan.
+	if strings.Contains(s, "regexreplace(") {
+		return fmt.Errorf(
+			"rendered Azure static-site main.tf in %q still calls regexreplace() (stale aeroform build, or AEROFORM_DISK_TEMPLATES=1 with old files under .\\templates\\).\n"+
+				"(this binary: aeroform %s)\n\n"+
+				"Fix: go install github.com/momo-s15/aeroform@main, run: Remove-Item Env:AEROFORM_DISK_TEMPLATES -ErrorAction SilentlyContinue,\n"+
+				"delete folder %q, then run launch again",
+			workDir, Version, workDir,
+		)
+	}
+	if strings.Contains(s, azureStaticSiteSchemaMarker) {
 		return nil
 	}
 	return fmt.Errorf(
