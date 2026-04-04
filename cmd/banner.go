@@ -21,6 +21,7 @@ func bannerVersionLabel() string {
 // printBanner prints the Aeroform ASCII wordmark, feature table, and taglines.
 // Honors NO_COLOR; outputs to w (use cmd.OutOrStdout() from commands).
 func printBanner(w io.Writer) {
+	fmt.Fprintln(w) // space below shell prompt so the wordmark is not flush against it
 	noColor := func() bool {
 		_, ok := os.LookupEnv("NO_COLOR")
 		return ok
