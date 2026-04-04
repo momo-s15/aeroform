@@ -221,26 +221,34 @@ Same templates, same security, more control.
 
 ```
 aeroform/
-├── cmd/                    Cobra command definitions
+├── main.go                 Program entry (delegates to cmd)
+├── cmd/                    Cobra command definitions + shared UI helpers
 ├── internal/
 │   ├── config/             Viper config loading + validation
 │   ├── cost/               Cost estimation (Simple + Pro, per-cloud)
-│   ├── engine/             Simple/Pro planners, drift detection
+│   ├── engine/             Simple/Pro planners, drift, upgrade, mode detect
 │   ├── llm/                Ollama, OpenAI, Bedrock backends
 │   ├── logger/             Zap structured logging
+│   ├── prompt/             LLM prompt bodies (Simple + Pro selection)
 │   ├── providers/          AWS, Azure, GCP implementations
 │   ├── security/           Scanning, auto-correction, policies
+│   ├── setup/              Ollama/model setup for `aeroform setup`
+│   ├── simplestate/        JSON state for tracked Simple Mode projects
 │   ├── terraform/          Renderer, runner, workspace mgmt
 │   └── ui/                 Colored terminal output
-├── bootstrap/              Cloud OIDC + state bootstrap
+├── bootstrap/              Cloud OIDC + state bootstrap (library + per-cloud)
 ├── templates/
+│   ├── embedded.go         go:embed of simple/ + pro/ for release binaries
 │   ├── simple/{cloud}/     14 Simple Mode templates
 │   └── pro/{cloud}/        18 Pro Mode templates
-├── docs/                   Full documentation site
+├── docs/                   Documentation (Markdown)
 └── test/
-    ├── integration/        LocalStack-based tests
-    └── e2e/                Real cloud deploy/destroy tests
+    ├── integration/        LocalStack (`//go:build integration`)
+    ├── e2e/                Real cloud deploy/destroy (`//go:build e2e`)
+    └── unit/               README only — package tests live next to code (`internal/`, `cmd/`, …)
 ```
+
+Root tooling you will also see: **`install.sh`**, **`Makefile`**, **`docker-compose.yml`** (LocalStack), **`.github/workflows/`** (CI, security, E2E, release), **`config.yaml.example`**, **`.goreleaser.yaml`**.
 
 ---
 
