@@ -32,11 +32,12 @@ var launchCmd = &cobra.Command{
 		out := cmd.OutOrStdout()
 		printBanner(out)
 
-		plan, err := gatherSimpleLaunchPlan()
+		plan, err := gatherSimpleLaunchPlan(out)
 		if err != nil {
 			return err
 		}
 
+		fmt.Fprintln(out, "→ Checking plan against Simple Mode security rules…")
 		report := security.EvaluateSimplePlan(plan)
 		security.PrintSimpleReport(out, report)
 		if report.BlockingCount > 0 {
@@ -137,7 +138,7 @@ var launchCmd = &cobra.Command{
 	},
 }
 
-func gatherSimpleLaunchPlan() (engine.SimpleLaunchPlan, error) {
+func gatherSimpleLaunchPlan(out io.Writer) (engine.SimpleLaunchPlan, error) {
 	request, err := uiPrompt("What do you want to launch", "a personal website", validateNotEmpty)
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
@@ -172,6 +173,9 @@ func gatherSimpleLaunchPlan() (engine.SimpleLaunchPlan, error) {
 			return engine.SimpleLaunchPlan{}, err
 		}
 	}
+
+	fmt.Fprintln(out, "")
+	fmt.Fprintln(out, "→ Matching your request to a template (local AI may take a few seconds)…")
 
 	plan, err := engine.BuildSimpleLaunchPlanWithClient(engine.SimpleLaunchInput{
 		Prompt:       request,

@@ -34,17 +34,19 @@ func uiPrompt(label, defaultVal string, validate promptui.ValidateFunc) (string,
 
 func uiPromptOptional(label string) (string, error) {
 	p := promptui.Prompt{
-		Label:   label,
-		Default: "",
+		Label:       label,
+		Default:     "",
+		HideEntered: true, // avoids a second echoed line on Windows after Enter (esp. when skipping blank)
 	}
 	return p.Run()
 }
 
 func uiConfirm(label string) (bool, error) {
 	p := promptui.Prompt{
-		Label:     label,
-		IsConfirm: true,
-		Default:   "y",
+		Label:       label,
+		IsConfirm:   true,
+		Default:     "y",
+		HideEntered: true, // cleaner line after Y/n on Windows terminals
 	}
 	result, err := p.Run()
 	if err != nil {
