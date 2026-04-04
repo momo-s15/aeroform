@@ -187,8 +187,14 @@ func gatherSimpleLaunchPlan(out io.Writer) (engine.SimpleLaunchPlan, error) {
 
 	var gcpProjectID string
 	if provider == "gcp" {
-		gcpDefault := firstNonEmpty(os.Getenv("GOOGLE_PROJECT"), os.Getenv("GCP_PROJECT"), os.Getenv("CLOUDSDK_CORE_PROJECT"))
-		gcpProjectID, err = uiPrompt("GCP project ID", gcpDefault, validateGCPProjectID)
+		// AEROFORM_GCP_PROJECT_ID avoids promptui on Windows where some keys (e.g. letters, backspace) misbehave.
+		gcpDefault := firstNonEmpty(
+			os.Getenv("AEROFORM_GCP_PROJECT_ID"),
+			os.Getenv("GOOGLE_PROJECT"),
+			os.Getenv("GCP_PROJECT"),
+			os.Getenv("CLOUDSDK_CORE_PROJECT"),
+		)
+		gcpProjectID, err = uiPrompt("GCP project ID (set AEROFORM_GCP_PROJECT_ID to skip typing)", gcpDefault, validateGCPProjectID)
 		if err != nil {
 			return engine.SimpleLaunchPlan{}, err
 		}
