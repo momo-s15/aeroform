@@ -71,6 +71,9 @@ var launchCmd = &cobra.Command{
 		if err := terraform.GenerateTfvars(vars, workDir); err != nil {
 			return fmt.Errorf("generate tfvars: %w", err)
 		}
+		if plan.Provider == "azure" {
+			fmt.Fprintf(out, "-> Using Azure location %q for this deploy (if this is wrong, set AEROFORM_AZURE_LOCATION and run again)\n", vars["location"])
+		}
 
 		corrections, err := security.AutoCorrect(workDir)
 		if err != nil {
