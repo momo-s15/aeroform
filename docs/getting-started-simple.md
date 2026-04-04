@@ -14,6 +14,8 @@ You do **not** need Go installed if you use the **install script** (macOS/Linux)
 
 Make sure you are authenticated with your chosen cloud provider before running Aeroform. For AWS, that means `aws configure` or environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`).
 
+For **Azure**, `aeroform launch` asks for an **Azure region**. Some subscriptions (including Azure for Education) **block** regions like `eastus` via policy; if storage creation fails with `RequestDisallowedByAzure`, pick an allowed region (often **`canadacentral`** or **`canadaeast`** in Canada). You can list names with `az account list-locations -o table`. Set a default with `AEROFORM_AZURE_LOCATION` to skip retyping.
+
 ## Install Aeroform
 
 **Recommended (macOS / Linux, no Go):**

@@ -12,23 +12,25 @@ import (
 )
 
 type SimpleLaunchInput struct {
-	Prompt       string
-	Provider     string
-	ProjectName  string
-	CustomDomain string
-	GCPProjectID string // required when Provider is gcp (Terraform google provider project)
+	Prompt        string
+	Provider      string
+	ProjectName   string
+	CustomDomain  string
+	GCPProjectID  string // required when Provider is gcp (Terraform google provider project)
+	AzureLocation string // Azure region (e.g. canadacentral) when Provider is azure
 }
 
 type SimpleLaunchPlan struct {
-	Provider     string
-	ProjectName  string
-	Prompt       string
-	Template     string
-	TemplateDir  string
-	CustomDomain string
-	GCPProjectID string
-	Cost         cost.Estimate
-	Summary      []string
+	Provider      string
+	ProjectName   string
+	Prompt        string
+	Template      string
+	TemplateDir   string
+	CustomDomain  string
+	GCPProjectID  string
+	AzureLocation string
+	Cost          cost.Estimate
+	Summary       []string
 }
 
 func BuildSimpleLaunchPlan(input SimpleLaunchInput) (SimpleLaunchPlan, error) {
@@ -68,14 +70,15 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 	costEstimate := cost.EstimateForSimpleTemplate(provider, template, strings.TrimSpace(input.CustomDomain) != "", 20)
 
 	plan := SimpleLaunchPlan{
-		Provider:     provider,
-		ProjectName:  projectName,
-		Prompt:       strings.TrimSpace(input.Prompt),
-		Template:     template,
-		TemplateDir:  templateDir,
-		CustomDomain: strings.TrimSpace(input.CustomDomain),
-		GCPProjectID: strings.TrimSpace(input.GCPProjectID),
-		Cost:         costEstimate,
+		Provider:      provider,
+		ProjectName:   projectName,
+		Prompt:        strings.TrimSpace(input.Prompt),
+		Template:      template,
+		TemplateDir:   templateDir,
+		CustomDomain:  strings.TrimSpace(input.CustomDomain),
+		GCPProjectID:  strings.TrimSpace(input.GCPProjectID),
+		AzureLocation: strings.TrimSpace(strings.ToLower(input.AzureLocation)),
+		Cost:          costEstimate,
 		Summary: []string{
 			fmt.Sprintf("provider: %s", provider),
 			fmt.Sprintf("project: %s", projectName),
@@ -85,6 +88,9 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 	}
 	if provider == "gcp" && plan.GCPProjectID != "" {
 		plan.Summary = append(plan.Summary, "gcp_project_id: "+plan.GCPProjectID)
+	}
+	if provider == "azure" && plan.AzureLocation != "" {
+		plan.Summary = append(plan.Summary, "azure_region: "+plan.AzureLocation)
 	}
 	return plan, nil
 }

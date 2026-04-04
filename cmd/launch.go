@@ -165,6 +165,20 @@ func gatherSimpleLaunchPlan(out io.Writer) (engine.SimpleLaunchPlan, error) {
 		return engine.SimpleLaunchPlan{}, err
 	}
 
+	var azureLocation string
+	if provider == "azure" {
+		azDef := firstNonEmpty(
+			os.Getenv("AEROFORM_AZURE_LOCATION"),
+			os.Getenv("AZURE_LOCATION"),
+			os.Getenv("AZURE_DEFAULT_REGION"),
+			"canadacentral",
+		)
+		azureLocation, err = uiPrompt("Azure region (try canadacentral on Azure for Education if eastus is blocked)", azDef, validateAzureRegion)
+		if err != nil {
+			return engine.SimpleLaunchPlan{}, err
+		}
+	}
+
 	var gcpProjectID string
 	if provider == "gcp" {
 		gcpDefault := firstNonEmpty(os.Getenv("GOOGLE_PROJECT"), os.Getenv("GCP_PROJECT"), os.Getenv("CLOUDSDK_CORE_PROJECT"))
@@ -178,11 +192,12 @@ func gatherSimpleLaunchPlan(out io.Writer) (engine.SimpleLaunchPlan, error) {
 	fmt.Fprintln(out, "→ Matching your request to a template (local AI may take a few seconds)…")
 
 	plan, err := engine.BuildSimpleLaunchPlanWithClient(engine.SimpleLaunchInput{
-		Prompt:       request,
-		Provider:     provider,
-		ProjectName:  projectName,
-		CustomDomain: customDomain,
-		GCPProjectID: gcpProjectID,
+		Prompt:        request,
+		Provider:      provider,
+		ProjectName:   projectName,
+		CustomDomain:  customDomain,
+		GCPProjectID:  gcpProjectID,
+		AzureLocation: azureLocation,
 	}, llmClientForSimpleMode())
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
@@ -218,7 +233,7 @@ func simpleTfvars(plan engine.SimpleLaunchPlan) map[string]string {
 	case "aws":
 		vars["region"] = firstNonEmpty(os.Getenv("AWS_REGION"), os.Getenv("AWS_DEFAULT_REGION"), "us-east-1")
 	case "azure":
-		vars["location"] = firstNonEmpty(os.Getenv("AEROFORM_AZURE_LOCATION"), os.Getenv("AZURE_LOCATION"), "eastus")
+		vars["location"] = firstNonEmpty(plan.AzureLocation, os.Getenv("AEROFORM_AZURE_LOCATION"), os.Getenv("AZURE_LOCATION"), "canadacentral")
 	case "gcp":
 		vars["region"] = firstNonEmpty(os.Getenv("GOOGLE_REGION"), os.Getenv("GCP_REGION"), "us-central1")
 		vars["project_id"] = plan.GCPProjectID

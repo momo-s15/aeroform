@@ -79,6 +79,23 @@ func validateSlug(input string) error {
 	return nil
 }
 
+// Azure region names: lowercase, no spaces (e.g. eastus, canadacentral).
+var azureRegionPattern = regexp.MustCompile(`^[a-z]{2,}[-a-z0-9]*$`)
+
+func validateAzureRegion(input string) error {
+	v := strings.TrimSpace(strings.ToLower(input))
+	if v == "" {
+		return fmt.Errorf("Azure region cannot be empty")
+	}
+	if len(v) < 5 || len(v) > 40 {
+		return fmt.Errorf("Azure region looks invalid (length)")
+	}
+	if !azureRegionPattern.MatchString(v) {
+		return fmt.Errorf("use a lowercase Azure region name (e.g. canadacentral, eastus)")
+	}
+	return nil
+}
+
 func validateGCPProjectID(input string) error {
 	v := strings.TrimSpace(input)
 	if v == "" {
