@@ -14,9 +14,12 @@ import (
 // replacing Terraform variable references (var.KEY) with concrete values
 // from the vars map. Files that are not .tf are copied verbatim.
 //
-// templateDir is normally "templates/simple/aws/static-site". If that path
-// does not exist on disk (e.g. user ran aeroform from another folder), files
-// are read from the embedded copy shipped in the binary.
+// For relative paths under templates/ (e.g. templates/simple/aws/static-site),
+// the embedded copy shipped in the binary is used first so a stray templates/
+// tree in the current working directory cannot override it. To force disk
+// (e.g. when developing templates), set AEROFORM_DISK_TEMPLATES=1.
+//
+// Absolute templateDir always reads from disk (used by tests and tooling).
 func RenderTemplate(templateDir string, vars map[string]string, outputDir string) error {
 	rootFS, err := resolveTemplateFS(templateDir)
 	if err != nil {
@@ -45,20 +48,56 @@ func RenderTemplate(templateDir string, vars map[string]string, outputDir string
 
 func resolveTemplateFS(templateDir string) (fs.FS, error) {
 	clean := filepath.Clean(templateDir)
+
+	if filepath.IsAbs(clean) {
+		if fi, err := os.Stat(clean); err == nil && fi.IsDir() {
+			return os.DirFS(clean), nil
+		}
+		return nil, fmt.Errorf("template dir not found: %s", clean)
+	}
+
+	rel := embeddedRel(filepath.ToSlash(clean))
+	if rel == "" {
+		return nil, fmt.Errorf("empty template path after normalizing %q", templateDir)
+	}
+
+	if !envUseDiskTemplates() {
+		if sub, err := openEmbedded(rel); err == nil {
+			return sub, nil
+		}
+	}
+
 	if fi, err := os.Stat(clean); err == nil && fi.IsDir() {
 		return os.DirFS(clean), nil
 	}
 
-	rel := filepath.ToSlash(clean)
-	rel = strings.TrimPrefix(rel, "templates/")
-	rel = strings.TrimPrefix(rel, "./templates/")
-	if rel == "" {
-		return nil, fmt.Errorf("empty template path after templates/")
+	if sub, err := openEmbedded(rel); err == nil {
+		return sub, nil
 	}
+	return nil, fmt.Errorf("template not found on disk or embedded: %s (embed key %q)", clean, rel)
+}
 
+func envUseDiskTemplates() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("AEROFORM_DISK_TEMPLATES")))
+	return v == "1" || v == "true" || v == "yes"
+}
+
+func embeddedRel(slashPath string) string {
+	s := strings.TrimPrefix(slashPath, "./")
+	if strings.HasPrefix(s, "templates/") {
+		return strings.TrimPrefix(s, "templates/")
+	}
+	return s
+}
+
+func openEmbedded(rel string) (fs.FS, error) {
 	sub, err := fs.Sub(templatedata.Files, rel)
 	if err != nil {
-		return nil, fmt.Errorf("embedded: %w", err)
+		return nil, err
+	}
+	entries, err := fs.ReadDir(sub, ".")
+	if err != nil || len(entries) == 0 {
+		return nil, fmt.Errorf("empty or unreadable embedded dir %q", rel)
 	}
 	return sub, nil
 }

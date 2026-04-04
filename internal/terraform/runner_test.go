@@ -70,6 +70,8 @@ func TestRenderTemplateFailsOnMissingDir(t *testing.T) {
 }
 
 func TestRenderTemplateUsesEmbedWhenNotOnDisk(t *testing.T) {
+	t.Setenv("AEROFORM_DISK_TEMPLATES", "")
+
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -92,6 +94,79 @@ func TestRenderTemplateUsesEmbedWhenNotOnDisk(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(out, "main.tf"))
 	if err != nil || len(b) < 50 {
 		t.Fatalf("expected embedded main.tf: %v len=%d", err, len(b))
+	}
+}
+
+func TestRenderTemplatePrefersEmbeddedOverStaleDisk(t *testing.T) {
+	t.Setenv("AEROFORM_DISK_TEMPLATES", "")
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Chdir(wd) }()
+
+	root := t.TempDir()
+	staleDir := filepath.Join(root, "templates", "simple", "aws", "static-site")
+	if err := os.MkdirAll(staleDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(staleDir, "main.tf"), []byte("# STALE_DISK_OVERRIDE\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
+
+	out := t.TempDir()
+	if err := RenderTemplate("templates/simple/aws/static-site", nil, out); err != nil {
+		t.Fatalf("RenderTemplate: %v", err)
+	}
+	b, err := os.ReadFile(filepath.Join(out, "main.tf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(b)
+	if strings.Contains(s, "STALE_DISK_OVERRIDE") {
+		t.Fatal("embedded template should win over a templates/ tree in CWD")
+	}
+	if !strings.Contains(s, `resource "aws_s3_bucket"`) {
+		t.Fatalf("expected shipped AWS static-site template, got:\n%s", s)
+	}
+}
+
+func TestRenderTemplateDiskTemplatesEnvUsesCWD(t *testing.T) {
+	t.Setenv("AEROFORM_DISK_TEMPLATES", "1")
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Chdir(wd) }()
+
+	root := t.TempDir()
+	staleDir := filepath.Join(root, "templates", "simple", "aws", "static-site")
+	if err := os.MkdirAll(staleDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	want := "# DISK_OVERRIDE_MARKER\n"
+	if err := os.WriteFile(filepath.Join(staleDir, "main.tf"), []byte(want), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
+
+	out := t.TempDir()
+	if err := RenderTemplate("templates/simple/aws/static-site", nil, out); err != nil {
+		t.Fatalf("RenderTemplate: %v", err)
+	}
+	b, err := os.ReadFile(filepath.Join(out, "main.tf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(b), "DISK_OVERRIDE_MARKER") {
+		t.Fatalf("AEROFORM_DISK_TEMPLATES=1 should use CWD disk copy; got:\n%s", string(b))
 	}
 }
 
