@@ -6,7 +6,21 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
+}
+
+# GCS bucket names are global; suffix avoids 409 on common slugs like static-demo-site.
+resource "random_id" "bucket" {
+  byte_length = 4
+}
+
+locals {
+  # 3–63 chars: letters, numbers, hyphens only (hyphens removed from core for a compact slug).
+  bucket_name = "${substr(replace(lower(var.project_name), "-", ""), 0, 48)}-${random_id.bucket.hex}"
 }
 
 provider "google" {
@@ -28,7 +42,7 @@ resource "google_project_service" "storage_api" {
 }
 
 resource "google_storage_bucket" "site" {
-  name     = "${var.project_name}-site"
+  name     = local.bucket_name
   project  = var.project_id
   location = var.region
 
