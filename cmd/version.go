@@ -18,7 +18,15 @@ var versionCmd = &cobra.Command{
 	Short: "Print the Aeroform version",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		out := cmd.OutOrStdout()
-		fmt.Fprintf(out, "aeroform %s\n", Version)
+		display := Version
+		if display == "dev" {
+			if info, ok := debug.ReadBuildInfo(); ok {
+				if mv := info.Main.Version; mv != "" && mv != "(devel)" {
+					display = mv
+				}
+			}
+		}
+		fmt.Fprintf(out, "aeroform %s\n", display)
 		if Version == "dev" {
 			if info, ok := debug.ReadBuildInfo(); ok {
 				for _, s := range info.Settings {
