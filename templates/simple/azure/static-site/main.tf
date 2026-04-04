@@ -6,7 +6,24 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.80"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
+}
+
+# Storage account names are globally unique across Azure; suffix avoids collisions on common project slugs.
+resource "random_string" "storage_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+locals {
+  # 3–24 chars, lowercase letters and numbers only
+  name_slug = substr(regexreplace(lower(var.project_name), "[^a-z0-9]", ""), 0, 18)
+  storage_account_name = "${local.name_slug}${random_string.storage_suffix.result}"
 }
 
 provider "azurerm" {
@@ -24,7 +41,7 @@ resource "azurerm_resource_group" "site" {
 }
 
 resource "azurerm_storage_account" "site" {
-  name                     = replace(var.project_name, "-", "")
+  name                     = local.storage_account_name
   resource_group_name      = azurerm_resource_group.site.name
   location                 = azurerm_resource_group.site.location
   account_tier             = "Standard"
