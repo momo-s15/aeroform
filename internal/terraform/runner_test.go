@@ -69,6 +69,32 @@ func TestRenderTemplateFailsOnMissingDir(t *testing.T) {
 	}
 }
 
+func TestRenderTemplateUsesEmbedWhenNotOnDisk(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = os.Chdir(wd) }()
+
+	tmp := t.TempDir()
+	if err := os.Chdir(tmp); err != nil {
+		t.Fatal(err)
+	}
+
+	out := t.TempDir()
+	err = RenderTemplate("templates/simple/aws/static-site", map[string]string{
+		"project_name": "embed-smoke",
+		"region":       "us-east-1",
+	}, out)
+	if err != nil {
+		t.Fatalf("RenderTemplate from embed: %v", err)
+	}
+	b, err := os.ReadFile(filepath.Join(out, "main.tf"))
+	if err != nil || len(b) < 50 {
+		t.Fatalf("expected embedded main.tf: %v len=%d", err, len(b))
+	}
+}
+
 func TestGenerateTfvars(t *testing.T) {
 	dir := t.TempDir()
 	vars := map[string]string{

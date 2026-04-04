@@ -6,13 +6,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	templatedata "github.com/momo-s15/aeroform/templates"
 )
 
 // RenderTemplate copies all files from templateDir into outputDir,
 // replacing Terraform variable references (var.KEY) with concrete values
 // from the vars map. Files that are not .tf are copied verbatim.
+//
+// templateDir is normally "templates/simple/aws/static-site". If that path
+// does not exist on disk (e.g. user ran aeroform from another folder), files
+// are read from the embedded copy shipped in the binary.
 func RenderTemplate(templateDir string, vars map[string]string, outputDir string) error {
-	entries, err := os.ReadDir(templateDir)
+	rootFS, err := resolveTemplateFS(templateDir)
 	if err != nil {
 		return fmt.Errorf("read template dir %s: %w", templateDir, err)
 	}
@@ -21,22 +27,46 @@ func RenderTemplate(templateDir string, vars map[string]string, outputDir string
 		return fmt.Errorf("create output dir %s: %w", outputDir, err)
 	}
 
+	entries, err := fs.ReadDir(rootFS, ".")
+	if err != nil {
+		return fmt.Errorf("read template dir %s: %w", templateDir, err)
+	}
+
 	for _, entry := range entries {
 		if entry.IsDir() {
 			continue
 		}
-		if err := renderFile(templateDir, entry, vars, outputDir); err != nil {
+		if err := renderFileFromFS(rootFS, entry, vars, outputDir); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func renderFile(templateDir string, entry fs.DirEntry, vars map[string]string, outputDir string) error {
-	srcPath := filepath.Join(templateDir, entry.Name())
-	data, err := os.ReadFile(srcPath)
+func resolveTemplateFS(templateDir string) (fs.FS, error) {
+	clean := filepath.Clean(templateDir)
+	if fi, err := os.Stat(clean); err == nil && fi.IsDir() {
+		return os.DirFS(clean), nil
+	}
+
+	rel := filepath.ToSlash(clean)
+	rel = strings.TrimPrefix(rel, "templates/")
+	rel = strings.TrimPrefix(rel, "./templates/")
+	if rel == "" {
+		return nil, fmt.Errorf("empty template path after templates/")
+	}
+
+	sub, err := fs.Sub(templatedata.Files, rel)
 	if err != nil {
-		return fmt.Errorf("read %s: %w", srcPath, err)
+		return nil, fmt.Errorf("embedded: %w", err)
+	}
+	return sub, nil
+}
+
+func renderFileFromFS(srcFS fs.FS, entry fs.DirEntry, vars map[string]string, outputDir string) error {
+	data, err := fs.ReadFile(srcFS, entry.Name())
+	if err != nil {
+		return fmt.Errorf("read %s: %w", entry.Name(), err)
 	}
 
 	content := string(data)
