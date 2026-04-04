@@ -10,7 +10,7 @@ Think of it as **one recipe file** Homebrew reads. That file lives in your **tap
 2. Click **Add file** → **Create new file**.
 3. In the name box type: **`Formula/aeroform.rb`**  
    (GitHub creates the `Formula` folder for you.)
-4. Paste the **entire** Ruby block from the **“Ready-to-paste formula (v1.0.4)”** section below (or use the generic template under **“Manual template (any version)”** when you release a newer version).
+4. Paste the **entire** Ruby block from the **“Ready-to-paste formula (v1.0.5)”** section below (or use the generic template under **“Manual template (any version)”** when you release a newer version).
 5. Click **Commit changes** on **`main`**.
 
 That is the whole setup. After that, anyone can run:
@@ -20,33 +20,33 @@ brew tap momo-s15/aeroform
 brew install aeroform
 ```
 
-**When you tag a new Aeroform version** (e.g. `v1.0.5`): edit `Formula/aeroform.rb` in the tap repo — change **`version`**, every **`v1.0.4`** in the **`url`** lines, and all four **`sha256`** strings. Use the new release’s **`checksums.txt`** on GitHub (same page as the binaries).
+**When you tag a new Aeroform version** (e.g. `v1.0.6`): edit `Formula/aeroform.rb` in the tap repo — change **`version`**, every **`v1.0.5`** in the **`url`** lines, and all four **`sha256`** strings. Use the new release’s **`checksums.txt`** on GitHub (same page as the binaries).
 
 ---
 
-## Ready-to-paste formula (v1.0.4)
+## Ready-to-paste formula (v1.0.5)
 
-Below matches [release v1.0.4](https://github.com/momo-s15/aeroform/releases/tag/v1.0.4). Replace this whole file when you ship a newer tag.
+Below matches [release v1.0.5](https://github.com/momo-s15/aeroform/releases/tag/v1.0.5). Replace this whole block when you ship a newer tag.
 
 ```ruby
 class Aeroform < Formula
   desc "CLI that turns plain English into cloud infrastructure (Terraform)"
   homepage "https://github.com/momo-s15/aeroform"
-  version "1.0.4"
+  version "1.0.5"
   license "Apache-2.0"
 
   on_macos do
     on_arm do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.4/aeroform-darwin-arm64"
-      sha256 "c6652913c8ea1f91da7f9d6c18308e6c7aa7a3d90e9219fe4fee40fff4e59288"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-darwin-arm64"
+      sha256 "b5f4d0cb005d1f1d9c314704d6b4e7fcd69b129fdbedf35d68b376b1127652d9"
 
       def install
         bin.install "aeroform-darwin-arm64" => "aeroform"
       end
     end
     on_intel do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.4/aeroform-darwin-amd64"
-      sha256 "7ea5a774c63dc4cb6c76b1d8e8103bf9dd652e29fdb260a7420834e00f70f77b"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-darwin-amd64"
+      sha256 "ee1afa255fa16e87b4283a291f88914a4ab4bb86ef7b26e07409d37bc78d8903"
 
       def install
         bin.install "aeroform-darwin-amd64" => "aeroform"
@@ -56,16 +56,16 @@ class Aeroform < Formula
 
   on_linux do
     on_arm do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.4/aeroform-linux-arm64"
-      sha256 "f3d289dd12dcc1f44e34bc1e85ccc6beec133eb6fe0df6d04fb7b3ae0daaf95e"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-linux-arm64"
+      sha256 "ccf164207898a66f22b3309da2de3a5ca1de5c920c209aa30afba61d00725afb"
 
       def install
         bin.install "aeroform-linux-arm64" => "aeroform"
       end
     end
     on_intel do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.4/aeroform-linux-amd64"
-      sha256 "f833fad0b0d71a6bdea1bb8d02eb0c29ff8cfcd0c25f3908a71b0ba1aed1fe5e"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-linux-amd64"
+      sha256 "cf41d547f8a305f5e034bed925a847a657642d8c93d12490318497ae3c30814f"
 
       def install
         bin.install "aeroform-linux-amd64" => "aeroform"
@@ -150,7 +150,7 @@ end
 After each release, open the tagged release on GitHub and download **`checksums.txt`**, or run:
 
 ```bash
-curl -fsSL https://github.com/momo-s15/aeroform/releases/download/v1.0.2/checksums.txt
+curl -fsSL https://github.com/momo-s15/aeroform/releases/download/v1.0.5/checksums.txt
 ```
 
 Each line looks like:
