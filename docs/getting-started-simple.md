@@ -163,7 +163,7 @@ aeroform destroy --confirm
 
 | Template | What it deploys | Est. monthly cost |
 |----------|----------------|-------------------|
-| `static-site` | Storage Account + CDN Standard | $1.00 |
+| `static-site` | Storage Account static website (HTTPS) | $0.50 |
 | `function-api` | Azure Functions (consumption plan) | $0.00 |
 
 ### GCP (2 templates)

@@ -119,7 +119,7 @@ The LLM is a **selection** mechanism, not a generation mechanism. It picks from 
 
 <table>
 <tr><th>AWS</th><th>Cost</th><th>Azure</th><th>Cost</th><th>GCP</th><th>Cost</th></tr>
-<tr><td>static-site</td><td>$0.50</td><td>static-site</td><td>$1.00</td><td>static-site</td><td>$0.50</td></tr>
+<tr><td>static-site</td><td>$0.50</td><td>static-site</td><td>$0.50</td><td>static-site</td><td>$0.50</td></tr>
 <tr><td>contact-form</td><td>$0.50</td><td>function-api</td><td>$0.00</td><td>cloud-run-api</td><td>$0.00</td></tr>
 <tr><td>lambda-api</td><td>$0.00</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>tiny-db</td><td>$14.99</td><td></td><td></td><td></td><td></td></tr>

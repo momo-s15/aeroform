@@ -52,8 +52,8 @@ var simpleTemplateCosts = map[string]map[string]TemplateCost{
 	},
 	"azure": {
 		"static-site": {
-			Monthly: decimal.NewFromFloat(1.00),
-			Note:    "Storage Account static website + CDN Standard profile",
+			Monthly: decimal.NewFromFloat(0.50),
+			Note:    "Storage Account static website (HTTPS); classic CDN creation no longer allowed on new Azure subscriptions",
 		},
 		"function-api": {
 			Monthly: decimal.NewFromInt(0),

@@ -32,11 +32,6 @@ resource "azurerm_storage_account" "site" {
   account_kind             = "StorageV2"
   min_tls_version          = "TLS1_2"
 
-  static_website {
-    index_document     = "index.html"
-    error_404_document = "error.html"
-  }
-
   blob_properties {
     versioning_enabled = true
   }
@@ -48,48 +43,13 @@ resource "azurerm_storage_account" "site" {
   }
 }
 
-resource "azurerm_cdn_profile" "site" {
-  name                = "${var.project_name}-cdn"
-  resource_group_name = azurerm_resource_group.site.name
-  location            = "global"
-  sku                 = "Standard_Microsoft"
+# Static website config (nested static_website on storage account is deprecated in favour of this resource).
+resource "azurerm_storage_account_static_website" "site" {
+  storage_account_id = azurerm_storage_account.site.id
 
-  tags = {
-    ManagedBy = "aeroform"
-    AeroMode  = "simple"
-  }
+  index_document     = "index.html"
+  error_404_document = "error.html"
 }
 
-resource "azurerm_cdn_endpoint" "site" {
-  name                = var.project_name
-  profile_name        = azurerm_cdn_profile.site.name
-  resource_group_name = azurerm_resource_group.site.name
-  location            = "global"
-
-  origin_host_header = azurerm_storage_account.site.primary_web_host
-
-  origin {
-    name      = "storage"
-    host_name = azurerm_storage_account.site.primary_web_host
-  }
-
-  delivery_rule {
-    name  = "EnforceHTTPS"
-    order = 1
-
-    request_scheme_condition {
-      operator     = "Equal"
-      match_values = ["HTTP"]
-    }
-
-    url_redirect_action {
-      redirect_type = "Found"
-      protocol      = "Https"
-    }
-  }
-
-  tags = {
-    ManagedBy = "aeroform"
-    AeroMode  = "simple"
-  }
-}
+# Classic Azure CDN (azurerm_cdn_profile / Standard_Microsoft) cannot be created after 2025-10-01.
+# This template serves the site directly from Storage static website (HTTPS). Add Front Door in Pro Mode if you need a full CDN.

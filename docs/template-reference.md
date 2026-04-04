@@ -37,7 +37,7 @@ Simple Mode templates are single, self-contained Terraform configurations design
 
 | Template | Description | Resources | Est. Cost |
 |----------|-------------|-----------|-----------|
-| `static-site` | Static website with CDN | Resource group, Storage Account (static website, TLS 1.2, versioning), CDN Standard profile, CDN endpoint (HTTPS) | $1.00/mo |
+| `static-site` | Static website (storage only) | Resource group, Storage Account (TLS 1.2, versioning), `azurerm_storage_account_static_website` (index/error docs). Classic CDN profile creation is blocked for new resources on Azure as of Oct 2025. | $0.50/mo |
 | `function-api` | Serverless API | Resource group, Storage Account, Service Plan (Linux Y1 consumption), Function App (HTTPS only, Node.js 20, FTPS disabled) | $0.00/mo |
 
 ### GCP — Simple Mode (2 templates)
