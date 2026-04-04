@@ -301,7 +301,7 @@ func checkAzureSimpleTemplateFresh(workDir string, plan engine.SimpleLaunchPlan)
 		return nil
 	}
 	return fmt.Errorf(
-		"Azure static-site files in %q are missing %q (stale aeroform binary, old templates/ checkout, or a project folder from an older run).\n"+
+		"azure static-site files in %q are missing %q (stale aeroform binary, old templates/ checkout, or a project folder from an older run).\n"+
 			"That often defaults the region to eastus and can destroy/recreate your resource group.\n\n"+
 			"Fix: go install github.com/momo-s15/aeroform@main (or git pull if you build from source), remove that project folder under .aeroform/projects, and run launch again",
 		workDir, azureStaticSiteSchemaMarker,

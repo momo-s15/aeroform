@@ -156,10 +156,10 @@ var azureRegionPattern = regexp.MustCompile(`^[a-z]{2,}[-a-z0-9]*$`)
 func validateAzureRegion(input string) error {
 	v := strings.TrimSpace(strings.ToLower(input))
 	if v == "" {
-		return fmt.Errorf("Azure region cannot be empty")
+		return fmt.Errorf("azure region cannot be empty")
 	}
 	if len(v) < 5 || len(v) > 40 {
-		return fmt.Errorf("Azure region looks invalid (length)")
+		return fmt.Errorf("azure region looks invalid (length)")
 	}
 	if !azureRegionPattern.MatchString(v) {
 		return fmt.Errorf("use a lowercase Azure region name (e.g. canadacentral, eastus)")
@@ -170,10 +170,10 @@ func validateAzureRegion(input string) error {
 func validateGCPProjectID(input string) error {
 	v := strings.TrimSpace(input)
 	if v == "" {
-		return fmt.Errorf("GCP project ID cannot be empty")
+		return fmt.Errorf("gcp project ID cannot be empty")
 	}
 	if len(v) < 6 || len(v) > 30 {
-		return fmt.Errorf("GCP project ID must be 6–30 characters")
+		return fmt.Errorf("gcp project ID must be 6–30 characters")
 	}
 	if !gcpProjectIDPattern.MatchString(v) {
 		return fmt.Errorf("must start with a letter; use only lowercase letters, digits, and hyphens")
