@@ -46,10 +46,15 @@ jobs:
         with:
           files: dist/*
 
+      # Do not use secrets.* in step `if:` — actionlint/IDE schema flags it; guard in shell instead.
       - name: Update Homebrew tap
-        if: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
         env:
           TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           AEROFORM_TAG: ${{ github.ref_name }}
           CHECKSUMS_FILE: dist/checksums.txt
-        run: bash scripts/push-homebrew-tap.sh
+        run: |
+          if [ -z "${TAP_TOKEN:-}" ]; then
+            echo "HOMEBREW_TAP_TOKEN not set; skipping Homebrew tap update."
+            exit 0
+          fi
+          bash scripts/push-homebrew-tap.sh

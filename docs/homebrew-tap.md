@@ -9,7 +9,7 @@ On every **`v*.*.*` tag**, [`.github/workflows/release.yml`](../.github/workflow
 1. Create a **fine-grained personal access token** (or classic PAT) with **Contents: Read and write** on **`homebrew-aeroform`** only (no need for admin on the main Aeroform repo).
 2. In **`momo-s15/aeroform`** → **Settings** → **Secrets and variables** → **Actions**, add repository secret **`HOMEBREW_TAP_TOKEN`** with that token.
 
-If the secret is **missing** (e.g. forks), the step is skipped and you can still update the tap **manually** (below). The **“Ready-to-paste formula”** section remains useful for docs and for one-off fixes.
+If the secret is **missing** (e.g. forks), the release job still runs that step but it **exits immediately** with a skip message (no `secrets` in step `if:` — avoids editor/linter false positives). You can still update the tap **manually** (below). The **“Ready-to-paste formula”** section remains useful for docs and for one-off fixes.
 
 ---
 
