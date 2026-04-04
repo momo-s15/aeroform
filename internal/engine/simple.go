@@ -16,6 +16,7 @@ type SimpleLaunchInput struct {
 	Provider     string
 	ProjectName  string
 	CustomDomain string
+	GCPProjectID string // required when Provider is gcp (Terraform google provider project)
 }
 
 type SimpleLaunchPlan struct {
@@ -25,6 +26,7 @@ type SimpleLaunchPlan struct {
 	Template     string
 	TemplateDir  string
 	CustomDomain string
+	GCPProjectID string
 	Cost         cost.Estimate
 	Summary      []string
 }
@@ -65,13 +67,14 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 	templateDir := filepath.ToSlash(filepath.Join("templates", "simple", provider, template))
 	costEstimate := cost.EstimateForSimpleTemplate(provider, template, strings.TrimSpace(input.CustomDomain) != "", 20)
 
-	return SimpleLaunchPlan{
+	plan := SimpleLaunchPlan{
 		Provider:     provider,
 		ProjectName:  projectName,
 		Prompt:       strings.TrimSpace(input.Prompt),
 		Template:     template,
 		TemplateDir:  templateDir,
 		CustomDomain: strings.TrimSpace(input.CustomDomain),
+		GCPProjectID: strings.TrimSpace(input.GCPProjectID),
 		Cost:         costEstimate,
 		Summary: []string{
 			fmt.Sprintf("provider: %s", provider),
@@ -79,7 +82,11 @@ func BuildSimpleLaunchPlanWithClient(input SimpleLaunchInput, client llm.Client)
 			fmt.Sprintf("template: %s", template),
 			fmt.Sprintf("template_dir: %s", templateDir),
 		},
-	}, nil
+	}
+	if provider == "gcp" && plan.GCPProjectID != "" {
+		plan.Summary = append(plan.Summary, "gcp_project_id: "+plan.GCPProjectID)
+	}
+	return plan, nil
 }
 
 func DefaultSimpleLLMClient() llm.Client {

@@ -10,6 +10,9 @@ import (
 
 var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*[a-z0-9]$`)
 
+// GCP project IDs: 6–30 chars, start with letter, lowercase letters, digits, hyphens.
+var gcpProjectIDPattern = regexp.MustCompile(`^[a-z][a-z0-9-]{4,28}[a-z0-9]$`)
+
 func uiSelect(label string, items []string) (string, error) {
 	sel := promptui.Select{
 		Label: label,
@@ -70,6 +73,20 @@ func validateSlug(input string) error {
 	}
 	if !slugPattern.MatchString(v) {
 		return fmt.Errorf("use only lowercase letters, digits, and hyphens (no leading/trailing hyphen)")
+	}
+	return nil
+}
+
+func validateGCPProjectID(input string) error {
+	v := strings.TrimSpace(input)
+	if v == "" {
+		return fmt.Errorf("GCP project ID cannot be empty")
+	}
+	if len(v) < 6 || len(v) > 30 {
+		return fmt.Errorf("GCP project ID must be 6–30 characters")
+	}
+	if !gcpProjectIDPattern.MatchString(v) {
+		return fmt.Errorf("must start with a letter; use only lowercase letters, digits, and hyphens")
 	}
 	return nil
 }

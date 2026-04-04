@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -65,13 +66,7 @@ var launchCmd = &cobra.Command{
 			return fmt.Errorf("render template: %w", err)
 		}
 
-		vars := map[string]string{
-			"project_name": plan.ProjectName,
-			"region":       "us-east-1",
-		}
-		if plan.CustomDomain != "" {
-			vars["custom_domain"] = plan.CustomDomain
-		}
+		vars := simpleTfvars(plan)
 		if err := terraform.GenerateTfvars(vars, workDir); err != nil {
 			return fmt.Errorf("generate tfvars: %w", err)
 		}
@@ -169,11 +164,21 @@ func gatherSimpleLaunchPlan() (engine.SimpleLaunchPlan, error) {
 		return engine.SimpleLaunchPlan{}, err
 	}
 
+	var gcpProjectID string
+	if provider == "gcp" {
+		gcpDefault := firstNonEmpty(os.Getenv("GOOGLE_PROJECT"), os.Getenv("GCP_PROJECT"), os.Getenv("CLOUDSDK_CORE_PROJECT"))
+		gcpProjectID, err = uiPrompt("GCP project ID", gcpDefault, validateGCPProjectID)
+		if err != nil {
+			return engine.SimpleLaunchPlan{}, err
+		}
+	}
+
 	plan, err := engine.BuildSimpleLaunchPlanWithClient(engine.SimpleLaunchInput{
 		Prompt:       request,
 		Provider:     provider,
 		ProjectName:  projectName,
 		CustomDomain: customDomain,
+		GCPProjectID: gcpProjectID,
 	}, llmClientForSimpleMode())
 	if err != nil {
 		return engine.SimpleLaunchPlan{}, err
@@ -188,6 +193,33 @@ func llmClientForSimpleMode() llm.Client {
 		return client
 	}
 	return nil
+}
+
+func firstNonEmpty(vals ...string) string {
+	for _, v := range vals {
+		if s := strings.TrimSpace(v); s != "" {
+			return s
+		}
+	}
+	return ""
+}
+
+// simpleTfvars maps provider-specific Terraform variable names (AWS uses region; Azure uses location; GCP needs project_id).
+func simpleTfvars(plan engine.SimpleLaunchPlan) map[string]string {
+	vars := map[string]string{"project_name": plan.ProjectName}
+	if plan.CustomDomain != "" {
+		vars["custom_domain"] = plan.CustomDomain
+	}
+	switch plan.Provider {
+	case "aws":
+		vars["region"] = firstNonEmpty(os.Getenv("AWS_REGION"), os.Getenv("AWS_DEFAULT_REGION"), "us-east-1")
+	case "azure":
+		vars["location"] = firstNonEmpty(os.Getenv("AEROFORM_AZURE_LOCATION"), os.Getenv("AZURE_LOCATION"), "eastus")
+	case "gcp":
+		vars["region"] = firstNonEmpty(os.Getenv("GOOGLE_REGION"), os.Getenv("GCP_REGION"), "us-central1")
+		vars["project_id"] = plan.GCPProjectID
+	}
+	return vars
 }
 
 func printSimpleLaunchSummary(out io.Writer, plan engine.SimpleLaunchPlan) {
