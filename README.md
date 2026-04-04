@@ -23,8 +23,8 @@ Aeroform is an open-source CLI that turns plain English into cloud infrastructur
 - **Pro Mode** — `config.yaml`-driven, multi-template composition, Checkov/tfsec gating, workspace environments. Built for teams.
 
 <p align="center">
-  <!-- Native size 800×488 PNG — matches source capture; max-width avoids overflow on mobile -->
-  <img src="docs/assets/demo-simple.png" alt="Windows PowerShell: Aeroform Simple Mode (aeroform launch) — portfolio website, AWS static-site, cost estimate, terraform plan/apply, CloudFront URL" width="800" style="max-width: 100%; height: auto;">
+  <!-- GIF 800×488 @ native width — do not upscale (blur). Source: ezgif-demo.gif -->
+  <img src="docs/assets/demo-simple.gif" alt="Screen recording: Aeroform Simple Mode on Windows PowerShell (aeroform launch) — portfolio site, AWS static-site, cost estimate, terraform plan/apply, CloudFront URL" width="800" style="max-width: 100%; height: auto;">
 </p>
 <p align="center"><em>Simple Mode (<code>aeroform launch</code>) — AWS static-site on Windows PowerShell</em></p>
 
