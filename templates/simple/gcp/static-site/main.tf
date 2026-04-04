@@ -14,10 +14,25 @@ provider "google" {
   region  = var.region
 }
 
+# Fresh GCP projects often have Compute disabled; load balancer resources need it.
+resource "google_project_service" "compute" {
+  project            = var.project_id
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "storage_api" {
+  project            = var.project_id
+  service            = "storage.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_storage_bucket" "site" {
   name     = "${var.project_name}-site"
   project  = var.project_id
   location = var.region
+
+  depends_on = [google_project_service.storage_api]
 
   uniform_bucket_level_access = true
   force_destroy               = true
@@ -47,6 +62,8 @@ resource "google_compute_backend_bucket" "site" {
   name        = "${var.project_name}-backend"
   bucket_name = google_storage_bucket.site.name
   enable_cdn  = true
+
+  depends_on = [google_project_service.compute]
 }
 
 resource "google_compute_url_map" "site" {
