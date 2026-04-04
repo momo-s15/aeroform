@@ -22,8 +22,8 @@ resource "random_string" "storage_suffix" {
 }
 
 locals {
-  # 3–24 chars, lowercase letters and numbers only
-  name_slug = substr(regexreplace(lower(var.project_name), "[^a-z0-9]", ""), 0, 18)
+  # 3–24 chars, lowercase letters and numbers only (project_name allows only a-z, 0-9, hyphens — avoid regexreplace for older Terraform).
+  name_slug            = substr(replace(lower(var.project_name), "-", ""), 0, 18)
   storage_account_name = "${local.name_slug}${random_string.storage_suffix.result}"
 }
 
