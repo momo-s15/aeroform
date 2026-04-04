@@ -92,18 +92,18 @@ In that repo, create:
 
 `Formula/aeroform.rb`
 
-Use this template. Replace **`1.0.2`** with your real version (the part **after** `v` in the tag) and replace every **`REPLACE_SHA256_...`** with the matching line from the release’s **`checksums.txt`**.
+Use this template. Replace **`1.0.5`** / **`v1.0.5`** with your real version (same value as the Git tag, with and without the leading `v`) and replace every **`REPLACE_SHA256_...`** with the matching line from the release’s **`checksums.txt`**.
 
 ```ruby
 class Aeroform < Formula
   desc "CLI that turns plain English into cloud infrastructure (Terraform)"
   homepage "https://github.com/momo-s15/aeroform"
-  version "1.0.2"
+  version "1.0.5"
   license "Apache-2.0"
 
   on_macos do
     on_arm do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.2/aeroform-darwin-arm64"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-darwin-arm64"
       sha256 "REPLACE_SHA256_DARWIN_ARM64"
 
       def install
@@ -111,7 +111,7 @@ class Aeroform < Formula
       end
     end
     on_intel do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.2/aeroform-darwin-amd64"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-darwin-amd64"
       sha256 "REPLACE_SHA256_DARWIN_AMD64"
 
       def install
@@ -122,7 +122,7 @@ class Aeroform < Formula
 
   on_linux do
     on_arm do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.2/aeroform-linux-arm64"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-linux-arm64"
       sha256 "REPLACE_SHA256_LINUX_ARM64"
 
       def install
@@ -130,7 +130,7 @@ class Aeroform < Formula
       end
     end
     on_intel do
-      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.2/aeroform-linux-amd64"
+      url "https://github.com/momo-s15/aeroform/releases/download/v1.0.5/aeroform-linux-amd64"
       sha256 "REPLACE_SHA256_LINUX_AMD64"
 
       def install
@@ -159,7 +159,7 @@ Each line looks like:
 
 Copy the hash into the matching `sha256` field.
 
-**URLs must use the same tag** as the release (`v1.0.2` in the path matches Git tag `v1.0.2`). Your [release workflow](https://github.com/momo-s15/aeroform/blob/main/.github/workflows/release.yml) publishes:
+**URLs must use the same tag** as the release (the `/download/vX.Y.Z/` segment must match the Git tag, e.g. `v1.0.5`). Your [release workflow](https://github.com/momo-s15/aeroform/blob/main/.github/workflows/release.yml) publishes:
 
 - `aeroform-darwin-amd64`, `aeroform-darwin-arm64`
 - `aeroform-linux-amd64`, `aeroform-linux-arm64`

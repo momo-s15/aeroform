@@ -198,7 +198,7 @@ All cost arithmetic uses `shopspring/decimal` to avoid floating-point rounding e
 ## CI, linting, and supply chain
 
 - **Go toolchain** is pinned via `go.mod` / `toolchain` so GitHub Actions, `govulncheck`, and contributors use a consistent compiler (currently Go 1.26.1+).
-- **Lint** uses **golangci-lint v2** (`.golangci.yml` `version: "2"`) so linters stay compatible with the supported Go release.
+- **Lint** uses **golangci-lint** major **v2** (`.golangci.yml` `version: "2"`); CI currently pins **v2.9** via `golangci/golangci-lint-action` so linters stay compatible with the supported Go release.
 - **Integration tests** exercise **Terraform plan** against **LocalStack** in CI (pinned image) so AWS-shaped templates are validated without a live account.
 - **E2E tests** are optional at release time: they run on `v*` tag pushes when AWS OIDC secrets are configured; otherwise the workflow skips after detecting missing configuration.
 - **Release builds** are produced by the tag-triggered workflow (multi-platform binaries uploaded to GitHub Releases).

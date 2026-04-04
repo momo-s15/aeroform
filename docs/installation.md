@@ -8,10 +8,10 @@ No Go toolchain required. Detects OS and CPU, downloads the matching binary from
 curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | sh
 ```
 
-Pin a specific version (tag must exist on GitHub, e.g. `v1.0.2`):
+Pin a specific version (tag must exist on GitHub, e.g. `v1.0.5`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | AEROFORM_VERSION=v1.0.2 sh
+curl -fsSL https://raw.githubusercontent.com/momo-s15/aeroform/main/install.sh | AEROFORM_VERSION=v1.0.5 sh
 ```
 
 Custom location:
@@ -28,7 +28,7 @@ Supported platforms: **linux/amd64**, **linux/arm64**, **darwin/amd64**, **darwi
 
 ## 2. Homebrew (macOS / Linux)
 
-Uses a separate tap repository (**[momo-s15/homebrew-aeroform](https://github.com/momo-s15/homebrew-aeroform)**). Once that repo exists and contains `Formula/aeroform.rb` (see **[homebrew-tap.md](homebrew-tap.md)** for the full setup checklist):
+Uses a separate tap repository (**[momo-s15/homebrew-aeroform](https://github.com/momo-s15/homebrew-aeroform)**) with **`Formula/aeroform.rb`**. Maintainer steps and a ready-to-paste formula are in **[homebrew-tap.md](homebrew-tap.md)**.
 
 ```bash
 brew tap momo-s15/aeroform
@@ -42,7 +42,7 @@ One-liner equivalent:
 brew install momo-s15/aeroform/aeroform
 ```
 
-Until the tap is published, use the **install script** or **`go install`** above. Optional automation: [GoReleaser `brews`](https://goreleaser.com/) — comments in [`.goreleaser.yaml`](../.goreleaser.yaml).
+The formula in the tap repo is updated **manually** when you tag a new Aeroform release (version, URLs, SHA256s from `checksums.txt`). Optional automation: [GoReleaser `brews`](https://goreleaser.com/) — comments in [`.goreleaser.yaml`](../.goreleaser.yaml).
 
 ---
 
@@ -57,7 +57,7 @@ go install github.com/momo-s15/aeroform@latest
 Pin a version:
 
 ```bash
-go install github.com/momo-s15/aeroform@v1.0.2
+go install github.com/momo-s15/aeroform@v1.0.5
 ```
 
 Ensure `$(go env GOPATH)/bin` is on your `PATH`. Best for **contributors**; less ideal for students who do not use Go yet.
@@ -67,6 +67,8 @@ Ensure `$(go env GOPATH)/bin` is on your `PATH`. Best for **contributors**; less
 ## Windows
 
 There is no one-line installer yet. From [Releases](https://github.com/momo-s15/aeroform/releases), download **`aeroform-windows-amd64.exe`** or **`aeroform-windows-arm64.exe`**, put it in a folder that is on your **PATH** (or add that folder to PATH). You can rename the file to `aeroform.exe` if you prefer.
+
+Interactive menus use **plain line input** on Windows (arrow-key `promptui` prompts are unreliable in some terminals). For **GCP** Simple Mode, you can set **`AEROFORM_GCP_PROJECT_ID`** so you are not blocked if project entry misbehaves.
 
 Future options: **Scoop** or **winget** manifests (similar to Homebrew, separate repo or PR to community buckets).
 

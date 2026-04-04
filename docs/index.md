@@ -47,7 +47,7 @@ aeroform generate "kubernetes cluster with database"
 
 ## Contributing & CI
 
-Contributors should follow [CONTRIBUTING.md](../CONTRIBUTING.md). The repository runs **lint** (golangci-lint v2), **unit tests**, **integration tests** (LocalStack in GitHub Actions), and **govulncheck** on pushes and pull requests. **E2E tests** (real AWS) run on version tags when `AWS_E2E_ROLE_ARN` and `AWS_ACCOUNT_ID` are configured for the `e2e` environment; otherwise that job skips cleanly.
+Contributors should follow [CONTRIBUTING.md](../CONTRIBUTING.md). The repository runs **lint** (golangci-lint **v2.9** in CI via `.github/workflows/ci.yml`), **unit tests**, **integration tests** (LocalStack in GitHub Actions), and **govulncheck** on pushes and pull requests. **E2E tests** (real AWS) run on version tags when `AWS_E2E_ROLE_ARN` and `AWS_ACCOUNT_ID` are configured for the `e2e` environment; otherwise that job skips cleanly.
 
 ## Key Commands
 
@@ -67,6 +67,8 @@ Contributors should follow [CONTRIBUTING.md](../CONTRIBUTING.md). The repository
 | `aeroform status` | Simple | Show tracked projects |
 | `aeroform cost` | Simple | Show estimated monthly spend |
 
+Run `aeroform --help` for the full command tree (`template`, `domain`, `open`, `logs`, `upgrade`, …).
+
 ## License
 
 Apache 2.0 — see [LICENSE](../LICENSE) in the repository root.
@@ -76,7 +78,7 @@ Apache 2.0 — see [LICENSE](../LICENSE) in the repository root.
 Install a specific version with:
 
 ```bash
-go install github.com/momo-s15/aeroform@v1.0.2
+go install github.com/momo-s15/aeroform@v1.0.5
 ```
 
 Prebuilt binaries are attached to [GitHub Releases](https://github.com/momo-s15/aeroform/releases) when the release workflow succeeds.

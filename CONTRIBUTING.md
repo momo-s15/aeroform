@@ -4,14 +4,14 @@ Thanks for contributing to Aeroform.
 
 Keep pull requests **focused** (one feature or fix), **tested**, and consistent with existing style. For historical implementation context, see `AEROFORM_PLAN.md` and `aeroform_blueprint.md`.
 
-End-user install options are in [docs/installation.md](docs/installation.md) (curl `install.sh`, Releases, future Homebrew).
+End-user install options are in [docs/installation.md](docs/installation.md) (curl `install.sh`, Releases, [Homebrew tap](docs/homebrew-tap.md), `go install`).
 
 ## What you need
 
 - **Go 1.26.1+** (match `go.mod` / `toolchain`; CI uses `go-version-file: go.mod`)
 - **Terraform** on `PATH` for integration-style checks locally
 - **Docker** (optional) for `make integration` with LocalStack
-- **golangci-lint v2** for `make lint` — [install](https://golangci-lint.run/welcome/install/) or rely on CI
+- **golangci-lint v2** (CI uses **v2.9**) for `make lint` — [install](https://golangci-lint.run/welcome/install/) or rely on CI
 
 ## Local checks
 
@@ -39,7 +39,7 @@ go test -tags e2e -timeout 900s ./test/e2e/...
 
 | Workflow | When | What |
 |----------|------|------|
-| `ci.yml` | push / PR | lint (golangci-lint v2.9), unit tests, LocalStack integration |
+| `ci.yml` | push / PR | lint (golangci-lint **v2.9**), unit tests, LocalStack integration |
 | `security.yml` | push / PR | `govulncheck`, dependency review (PRs) |
 | `e2e.yml` | tags `v*` | E2E if `AWS_E2E_ROLE_ARN` + `AWS_ACCOUNT_ID` set for `e2e` env; else skip |
 | `release.yml` | tags `v*.*.*` | tests + build release assets |

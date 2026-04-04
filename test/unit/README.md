@@ -1,5 +1,7 @@
 # Unit Tests
 
+**Prerequisites:** Go **1.26.1+** (see repo `go.mod`).
+
 Fast tests that run with:
 
 ```bash

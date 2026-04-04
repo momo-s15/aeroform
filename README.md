@@ -75,7 +75,7 @@ aeroform generate "kubernetes cluster with database"
 | **3. go install** | Contributors / Go users | `go install github.com/momo-s15/aeroform@latest` (needs [Go 1.26.1+](https://go.dev/dl/)) |
 | **Windows** | All | Download `aeroform-windows-amd64.exe` or `aeroform-windows-arm64.exe` from [Releases](https://github.com/momo-s15/aeroform/releases) and add to `PATH` |
 
-Optional: pin a version with the script — `AEROFORM_VERSION=v1.0.2 curl -fsSL ... | sh`. Full detail: **[docs/installation.md](docs/installation.md)**.
+Optional: pin a version with the script — `AEROFORM_VERSION=v1.0.5 curl -fsSL ... | sh`. Full detail: **[docs/installation.md](docs/installation.md)**.
 
 ---
 
@@ -200,6 +200,8 @@ Read more in the [Security Model](docs/security-model.md) docs.
 | `aeroform env add <name>` | Pro | Create environment workspace |
 | `aeroform policy add <file>` | Pro | Add custom Checkov policy |
 
+Run `aeroform --help` for the full tree (`template`, `domain`, `open`, `logs`, `upgrade`, …).
+
 ---
 
 ## Upgrade Path
@@ -248,6 +250,7 @@ aeroform/
 |------|-------------|
 | [Documentation home](docs/index.md) | Overview, requirements, CI/contributing links |
 | [Installation](docs/installation.md) | Install script, Homebrew tap, go install, Windows |
+| [Homebrew tap](docs/homebrew-tap.md) | Tap setup, formula template, ready-to-paste release snippet |
 | [Getting Started — Simple](docs/getting-started-simple.md) | Install to deployed website in 5 minutes |
 | [Getting Started — Pro](docs/getting-started-pro.md) | Config to EKS cluster with security gating |
 | [Template Reference](docs/template-reference.md) | All 32 templates with resources and costs |
@@ -263,11 +266,12 @@ From a clone of the repo:
 
 ```bash
 go test ./...                 # unit tests
-golangci-lint run ./...       # lint (config: .golangci.yml, golangci-lint v2)
+golangci-lint run ./...       # lint (config: .golangci.yml; CI uses golangci-lint v2.9)
 make integration              # Docker + LocalStack + integration tests
+make e2e                      # real AWS — billable; see test/e2e/README.md
 ```
 
-CI runs **lint**, **unit**, and **integration** (LocalStack service container) on every push/PR; **govulncheck** runs under **Security**. **E2E** (real AWS) runs on `v*` tags when repository/environment secrets are configured; otherwise it skips. See [CONTRIBUTING.md](CONTRIBUTING.md).
+CI runs **lint**, **unit**, and **integration** (LocalStack service container) on every push/PR; **govulncheck** runs under **Security**. **E2E** (real AWS) runs on `v*` tags when repository/environment secrets are configured; otherwise it skips. See [CONTRIBUTING.md](CONTRIBUTING.md) and [test/e2e/README.md](test/e2e/README.md).
 
 ---
 

@@ -36,7 +36,7 @@ Tests use `defer` cleanup so `terraform destroy` still runs after failures.
 
 ## CI (GitHub Actions)
 
-Workflow: `.github/workflows/e2e.yml` — triggers on **tags** matching `v*` (e.g. `v1.0.2`).
+Workflow: `.github/workflows/e2e.yml` — triggers on **tags** matching `v*` (e.g. `v1.0.5`).
 
 1. **Detect E2E configuration** — If `AWS_E2E_ROLE_ARN` and `AWS_ACCOUNT_ID` are **empty** (repository or `e2e` environment secrets), subsequent steps are **skipped** and the workflow **succeeds** with a notice. This is intentional for forks and repos that have not wired OIDC yet.
 2. When both secrets are set, the job uses **OIDC** (`aws-actions/configure-aws-credentials`) to assume the role and runs `go test -tags e2e ./test/e2e/...`.

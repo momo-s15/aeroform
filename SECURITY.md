@@ -31,7 +31,7 @@ Relevant areas include:
 
 ## Automated checks
 
-The default branch runs **`govulncheck`** and **`golangci-lint`** in GitHub Actions. Dependency changes on pull requests are reviewed by the **dependency-review** workflow. These do not replace responsible disclosure for undisclosed vulnerabilities.
+The default branch runs **`govulncheck`** and **`golangci-lint`** (v2, pinned in CI) in GitHub Actions. Dependency changes on pull requests are reviewed by the **dependency-review** workflow. These do not replace responsible disclosure for undisclosed vulnerabilities.
 
 ## Disclosure Expectations
 

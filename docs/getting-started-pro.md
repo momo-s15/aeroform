@@ -6,7 +6,7 @@ Pro Mode is for teams and professionals who need explicit control over infrastru
 
 | Tool | Why | Install |
 |------|-----|---------|
-| **Aeroform binary** | CLI | [install.sh](installation.md) (macOS/Linux) or [Releases](https://github.com/momo-s15/aeroform/releases) / `go install` |
+| **Aeroform binary** | CLI | [install.sh](installation.md), [Homebrew tap](homebrew-tap.md), [Releases](https://github.com/momo-s15/aeroform/releases), or `go install` |
 | **Go 1.26.1+** | Only if building from source or using `go install` | [go.dev/dl](https://go.dev/dl/) |
 | **Terraform** | Provisions cloud resources | [developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install) |
 | **Ollama** | Local LLM for template selection | [ollama.com/download](https://ollama.com/download) |
@@ -16,7 +16,9 @@ Pro Mode is for teams and professionals who need explicit control over infrastru
 
 ## Step 1 — Create config.yaml
 
-Pro Mode activates when a `config.yaml` file exists in your project directory. Scaffold one from the example:
+Pro Mode activates when **`config.yaml` in the current directory looks like an Aeroform config**: `mode: pro` or `mode: simple`, or a top-level **`cloud: aws`**, **`azure`**, or **`gcp`**. A generic YAML file with another shape (for example another tool’s `config.yaml`) does **not** switch you out of Simple Mode.
+
+Scaffold a valid file from the example:
 
 ```bash
 aeroform init
