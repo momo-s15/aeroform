@@ -66,6 +66,9 @@ var launchCmd = &cobra.Command{
 		if err := terraform.RenderTemplate(plan.TemplateDir, nil, workDir); err != nil {
 			return fmt.Errorf("render template: %w", err)
 		}
+		if err := checkAzureSimpleTemplateFresh(workDir, plan); err != nil {
+			return err
+		}
 
 		vars := simpleTfvars(plan)
 		if err := terraform.GenerateTfvars(vars, workDir); err != nil {
@@ -264,4 +267,26 @@ func printSimpleLaunchSummary(out io.Writer, plan engine.SimpleLaunchPlan) {
 		ui.Warn(out, "  ⚠ warning: this is over the $%s default budget\n", plan.Cost.Budget.StringFixed(2))
 	}
 	fmt.Fprintln(out, "")
+}
+
+// Marker in templates/simple/azure/static-site/main.tf — detects stale CLI or hand-edited copies.
+const azureStaticSiteSchemaMarker = "aeroform-schema: azure-static-site/2"
+
+func checkAzureSimpleTemplateFresh(workDir string, plan engine.SimpleLaunchPlan) error {
+	if plan.Provider != "azure" || plan.Template != "static-site" {
+		return nil
+	}
+	b, err := os.ReadFile(filepath.Join(workDir, "main.tf"))
+	if err != nil {
+		return nil
+	}
+	if strings.Contains(string(b), azureStaticSiteSchemaMarker) {
+		return nil
+	}
+	return fmt.Errorf(
+		"Azure static-site files in %q are missing %q (stale aeroform binary, old templates/ checkout, or a project folder from an older run).\n"+
+			"That often defaults the region to eastus and can destroy/recreate your resource group.\n\n"+
+			"Fix: go install github.com/momo-s15/aeroform@main (or git pull if you build from source), remove that project folder under .aeroform/projects, and run launch again",
+		workDir, azureStaticSiteSchemaMarker,
+	)
 }

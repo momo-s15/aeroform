@@ -9,7 +9,7 @@ variable "project_name" {
 }
 
 variable "location" {
-  description = "Azure region to deploy into"
+  description = "Azure region to deploy into (default suits many Azure for Education allow-lists; override via terraform.tfvars or AEROFORM_AZURE_LOCATION)"
   type        = string
-  default     = "eastus"
+  default     = "canadacentral"
 }
