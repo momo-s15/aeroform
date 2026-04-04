@@ -1,12 +1,74 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/manifoldco/promptui"
 )
+
+// One reader for Windows plain stdin prompts (promptui mishandles some keys in PowerShell).
+var winStdin = bufio.NewReader(os.Stdin)
+
+func useWindowsStdinPrompts() bool {
+	return runtime.GOOS == "windows"
+}
+
+func windowsReadLine(label, defaultVal string, validate promptui.ValidateFunc) (string, error) {
+	for {
+		if strings.TrimSpace(defaultVal) != "" {
+			fmt.Fprintf(os.Stdout, "%s [%s]: ", label, defaultVal)
+		} else {
+			fmt.Fprintf(os.Stdout, "%s: ", label)
+		}
+		line, err := winStdin.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+		line = strings.TrimSpace(strings.TrimSuffix(line, "\r"))
+		if line == "" {
+			line = strings.TrimSpace(defaultVal)
+		}
+		if validate != nil {
+			if err := validate(line); err != nil {
+				fmt.Fprintln(os.Stdout, err.Error())
+				continue
+			}
+		}
+		return line, nil
+	}
+}
+
+func windowsReadLineOptional(label string) (string, error) {
+	fmt.Fprintf(os.Stdout, "%s (Enter to skip): ", label)
+	line, err := winStdin.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(strings.TrimSuffix(line, "\r")), nil
+}
+
+func windowsConfirm(label string) (bool, error) {
+	for {
+		fmt.Fprintf(os.Stdout, "%s [y/N]: ", label)
+		line, err := winStdin.ReadString('\n')
+		if err != nil {
+			return false, err
+		}
+		line = strings.TrimSpace(strings.ToLower(strings.TrimSuffix(line, "\r")))
+		if line == "" || line == "y" || line == "yes" {
+			return true, nil
+		}
+		if line == "n" || line == "no" {
+			return false, nil
+		}
+		fmt.Fprintln(os.Stdout, "Please enter y, n, or Enter for yes.")
+	}
+}
 
 var slugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*[a-z0-9]$`)
 
@@ -24,6 +86,9 @@ func uiSelect(label string, items []string) (string, error) {
 }
 
 func uiPrompt(label, defaultVal string, validate promptui.ValidateFunc) (string, error) {
+	if useWindowsStdinPrompts() {
+		return windowsReadLine(label, defaultVal, validate)
+	}
 	p := promptui.Prompt{
 		Label:    label,
 		Default:  defaultVal,
@@ -33,6 +98,9 @@ func uiPrompt(label, defaultVal string, validate promptui.ValidateFunc) (string,
 }
 
 func uiPromptOptional(label string) (string, error) {
+	if useWindowsStdinPrompts() {
+		return windowsReadLineOptional(label)
+	}
 	p := promptui.Prompt{
 		Label:       label,
 		Default:     "",
@@ -42,6 +110,9 @@ func uiPromptOptional(label string) (string, error) {
 }
 
 func uiConfirm(label string) (bool, error) {
+	if useWindowsStdinPrompts() {
+		return windowsConfirm(label)
+	}
 	p := promptui.Prompt{
 		Label:       label,
 		IsConfirm:   true,

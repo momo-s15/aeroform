@@ -194,7 +194,7 @@ func gatherSimpleLaunchPlan(out io.Writer) (engine.SimpleLaunchPlan, error) {
 			os.Getenv("GCP_PROJECT"),
 			os.Getenv("CLOUDSDK_CORE_PROJECT"),
 		)
-		gcpProjectID, err = uiPrompt("GCP project ID (set AEROFORM_GCP_PROJECT_ID to skip typing)", gcpDefault, validateGCPProjectID)
+		gcpProjectID, err = uiPrompt("GCP project ID", gcpDefault, validateGCPProjectID)
 		if err != nil {
 			return engine.SimpleLaunchPlan{}, err
 		}
