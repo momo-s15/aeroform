@@ -42,7 +42,7 @@ One-liner equivalent:
 brew install momo-s15/aeroform/aeroform
 ```
 
-The formula in the tap repo is updated **manually** when you tag a new Aeroform release (version, URLs, SHA256s from `checksums.txt`). Optional automation: [GoReleaser `brews`](https://goreleaser.com/) — comments in [`.goreleaser.yaml`](../.goreleaser.yaml).
+Maintainers: with repository secret **`HOMEBREW_TAP_TOKEN`** (PAT scoped to **`homebrew-aeroform`**), [`.github/workflows/release.yml`](../.github/workflows/release.yml) updates **`Formula/aeroform.rb`** on every **`v*.*.*`** tag. Without it, update the tap manually (see **[homebrew-tap.md](homebrew-tap.md)**). Optional: [GoReleaser `brews`](https://goreleaser.com/) — not used in CI; see [`.goreleaser.yaml`](../.goreleaser.yaml).
 
 ---
 

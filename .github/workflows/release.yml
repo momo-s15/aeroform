@@ -45,3 +45,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
+
+      - name: Update Homebrew tap
+        if: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          AEROFORM_TAG: ${{ github.ref_name }}
+          CHECKSUMS_FILE: dist/checksums.txt
+        run: bash scripts/push-homebrew-tap.sh

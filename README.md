@@ -248,7 +248,7 @@ aeroform/
     └── unit/               README only — package tests live next to code (`internal/`, `cmd/`, …)
 ```
 
-Root tooling you will also see: **`install.sh`**, **`Makefile`**, **`docker-compose.yml`** (LocalStack), **`.github/workflows/`** (CI, security, E2E, release), **`config.yaml.example`**, **`.goreleaser.yaml`**.
+Root tooling you will also see: **`scripts/`** (e.g. Homebrew tap push after release), **`install.sh`**, **`Makefile`**, **`docker-compose.yml`** (LocalStack), **`.github/workflows/`** (CI, security, E2E, release), **`config.yaml.example`**, **`.goreleaser.yaml`**.
 
 ---
 

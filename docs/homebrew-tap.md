@@ -2,6 +2,17 @@
 
 This tap distributes **pre-built binaries** from [GitHub Releases](https://github.com/momo-s15/aeroform/releases) (same files as `install.sh`). You maintain a **separate** repository; Homebrew users never clone the main `aeroform` repo to install.
 
+## Automated updates (recommended)
+
+On every **`v*.*.*` tag**, [`.github/workflows/release.yml`](../.github/workflows/release.yml) publishes release assets, then — if a secret is configured — runs **`scripts/push-homebrew-tap.sh`** to commit and push **`Formula/aeroform.rb`** to **`momo-s15/homebrew-aeroform`**.
+
+1. Create a **fine-grained personal access token** (or classic PAT) with **Contents: Read and write** on **`homebrew-aeroform`** only (no need for admin on the main Aeroform repo).
+2. In **`momo-s15/aeroform`** → **Settings** → **Secrets and variables** → **Actions**, add repository secret **`HOMEBREW_TAP_TOKEN`** with that token.
+
+If the secret is **missing** (e.g. forks), the step is skipped and you can still update the tap **manually** (below). The **“Ready-to-paste formula”** section remains useful for docs and for one-off fixes.
+
+---
+
 ## You already created the tap repo — what now?
 
 Think of it as **one recipe file** Homebrew reads. That file lives in your **tap** repo (not in `momo-s15/aeroform`).
@@ -20,7 +31,7 @@ brew tap momo-s15/aeroform
 brew install aeroform
 ```
 
-**When you tag a new Aeroform version** (e.g. `v1.0.6`): edit `Formula/aeroform.rb` in the tap repo — change **`version`**, every **`v1.0.5`** in the **`url`** lines, and all four **`sha256`** strings. Use the new release’s **`checksums.txt`** on GitHub (same page as the binaries).
+**When you tag a new Aeroform version** (e.g. `v1.0.6`): with **`HOMEBREW_TAP_TOKEN`** set, CI updates the tap for you. Otherwise edit `Formula/aeroform.rb` in the tap repo — change **`version`**, every tag segment in the **`url`** lines, and all four **`sha256`** strings from the new release’s **`checksums.txt`**.
 
 ---
 

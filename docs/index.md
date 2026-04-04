@@ -39,7 +39,7 @@ aeroform generate "kubernetes cluster with database"
 
 | Page | What it covers |
 |------|----------------|
-| [Homebrew tap](homebrew-tap.md) | Maintainers: publish `brew install` via `homebrew-aeroform` |
+| [Homebrew tap](homebrew-tap.md) | Tap setup; CI can auto-push the formula when `HOMEBREW_TAP_TOKEN` is set |
 | [Template Reference](template-reference.md) | Every template (Simple + Pro, all clouds) with resources and costs |
 | [LLM Backends](llm-backends.md) | Setup for Ollama, OpenAI, and AWS Bedrock |
 | [Security Model](security-model.md) | Scanning, auto-correction, custom policies, drift detection |

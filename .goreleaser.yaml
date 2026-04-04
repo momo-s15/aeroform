@@ -3,15 +3,8 @@ version: 2
 # Used for local releases or a future CI switch. Today, GitHub Actions uses
 # .github/workflows/release.yml with explicit go build + names install.sh expects.
 #
-# Homebrew (v1.1.0+): create tap repo (e.g. momo-s15/homebrew-aeroform), then add:
-# brews:
-#   - repository:
-#       owner: momo-s15
-#       name: homebrew-aeroform
-#     homepage: https://github.com/momo-s15/aeroform
-#     description: CLI for natural-language cloud infrastructure
-#     ...
-# and run goreleaser release from CI with a token that can push to the tap.
+# Homebrew: the tap is updated by release CI via scripts/push-homebrew-tap.sh + HOMEBREW_TAP_TOKEN.
+# Optional GoReleaser brews block (below) is not used in CI today; keep this file for local archives/changelog.
 
 builds:
   - id: aeroform
